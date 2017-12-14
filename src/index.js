@@ -1,9 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './styles/index.css';
-import App from './components/App';
+import Step1 from './pages/Step1';
 import registerServiceWorker from './registerServiceWorker';
+import Step3 from './pages/Step3';
+import Step4 from './pages/Step4';
 import 'bootstrap/dist/css/bootstrap.css';
 
-ReactDOM.render( < App / > , document.getElementById('root'));
+ReactDOM.render(<Step4/>, document.getElementById('root'));
 registerServiceWorker();
