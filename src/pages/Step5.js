@@ -1,20 +1,20 @@
 import React, { Component } from "react";
-import logo from "../images/logo.svg";
 import "../styles/App.css";
 import Navbar from "../components/Navbar";
-import AppTopology from "../components/AppTopology";
 import GuideBar from "../components/GuideBar";
+import AppTestPlan from "../components/AppTestPlan";
+import DryRun from "../components/DryRun";
 
-class Step3 extends Component {
+class Step5 extends Component {
   render() {
     return (
       <div>
         <Navbar />
-        <GuideBar step={3} />
-        <AppTopology />
+        <GuideBar step={5} />
+        <DryRun />
       </div>
     );
   }
 }
 
-export default Step3;
+export default Step5;

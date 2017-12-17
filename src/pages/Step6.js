@@ -3,17 +3,19 @@ import "../styles/App.css";
 import Navbar from "../components/Navbar";
 import GuideBar from "../components/GuideBar";
 import AppTestPlan from "../components/AppTestPlan";
+import DryRun from "../components/DryRun";
+import DryrunResult from "../components/DryrunResult";
 
-class Step4 extends Component {
+class Step6 extends Component {
   render() {
     return (
       <div>
         <Navbar />
-        <GuideBar step={4} />
-        <AppTestPlan />
+        <GuideBar step={6} />
+        <DryrunResult />
       </div>
     );
   }
 }
 
-export default Step4;
+export default Step6;
