@@ -19,7 +19,7 @@ class Step1 extends Component {
         <Navbar />
         <GuideBar step={2} />
         <div className="container">
-          <div class="form-title">
+          <div className="form-title">
             <h1 style={{ color: "#2699fb" }}>Application Blue Print</h1>
           </div>
           <AceEditor

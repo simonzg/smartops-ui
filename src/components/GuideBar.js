@@ -8,13 +8,16 @@ class GuideBar extends Component {
             "Application Topology",
             "Test Plan",
             "Dry Run Plan",
-            "Dry Run"
+            "Dry Run Results"
         ];
         let lis = [];
         titles.forEach((item, index) => {
             lis.push(
-                <li className={this.props.step > index ? "active" : ""}>
-                    <div className="title">Application Topology</div>
+                <li
+                    className={this.props.step > index ? "active" : ""}
+                    key={index}
+                >
+                    <div className="title">{item}</div>
                 </li>
             );
         });
@@ -28,5 +31,4 @@ class GuideBar extends Component {
         );
     }
 }
-
 export default GuideBar;

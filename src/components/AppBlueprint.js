@@ -1,23 +1,20 @@
 import React, { Component } from "react";
-import "../styles/App.css";
-import Navbar from "../components/Navbar";
-import AppRequirements from "../components/AppRequirements";
-import GuideBar from "../components/GuideBar";
 
 import { render } from "react-dom";
 import brace from "brace";
 import AceEditor from "react-ace";
-import { BrowserRouter, Route, Link } from "react-router-dom";
-
+import { Link } from "react-router-dom";
 import "brace/mode/yaml";
 import "brace/theme/monokai";
+
 class AppBlueprint extends Component {
     render() {
         return (
-            <div className="container">
-                <div class="form-title">
-                    <h1 style={{ color: "#2699fb" }}>Application Blue Print</h1>
+            <div className="container body-container">
+                <div className="form-title">
+                    <h1>Application Blue Print</h1>
                 </div>
+
                 <AceEditor
                     mode="yaml"
                     theme="monokai"

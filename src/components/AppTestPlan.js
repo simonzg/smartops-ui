@@ -1,6 +1,5 @@
 import React, { Component } from "react";
-import { Button, Container, col, ul } from "reactstrap";
-import { BrowserRouter, Route, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 class AppTestPlan extends Component {
     render() {
@@ -10,7 +9,7 @@ class AppTestPlan extends Component {
                 <div className="row">
                     <div className="col-4">
                         <div className="form-group">
-                            <label className="label-blue" for="name">
+                            <label className="label-blue" htmlFor="name">
                                 Name
                             </label>
                             <div
@@ -27,7 +26,7 @@ class AppTestPlan extends Component {
                     </div>
                     <div className="col-4">
                         <div className="form-group">
-                            <label className="label-blue" for="url">
+                            <label className="label-blue" htmlFor="url">
                                 Url
                             </label>
                             <input
@@ -39,7 +38,7 @@ class AppTestPlan extends Component {
                     </div>
                     <div className="col-4">
                         <div className="form-group">
-                            <label className="label-blue" for="url">
+                            <label className="label-blue" htmlFor="url">
                                 Counts of Requestes Perscond
                             </label>
                             <select className="form-control" name="counts">
@@ -51,7 +50,7 @@ class AppTestPlan extends Component {
                     </div>
                 </div>
                 <div className="action-footer">
-                    <Link className="btn btn-main" to="/step/4">
+                    <Link className="btn btn-main" to="/step/5">
                         Next
                     </Link>
                 </div>

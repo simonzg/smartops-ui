@@ -1,26 +1,29 @@
 import ReactDOM from "react-dom";
 import React, { Component } from "react";
 import registerServiceWorker from "./registerServiceWorker";
-import Home from "./pages/Home";
-import Step1 from "./pages/Step1";
-import Step2 from "./pages/Step2";
-import Step3 from "./pages/Step3";
-import Step4 from "./pages/Step4";
-import Step5 from "./pages/Step5";
-import Step6 from "./pages/Step6";
-import Steps from "./pages/Steps";
 import "bootstrap/dist/css/bootstrap.css";
-import { BrowserRouter, Route, Link } from "react-router-dom";
+import "./styles/App.css";
+import { Route } from "react-router-dom";
+import { Provider } from "react-redux";
+import { ConnectedRouter } from "react-router-redux";
+import store, { history } from "./store";
+
+import Home from "./pages/Home";
+import Steps from "./pages/Steps";
+import Counter from "./containers/Counter";
 
 class App extends Component {
     render() {
         return (
-            <BrowserRouter>
-                <div>
-                    <Route exact path="/" component={Home} />
-                    <Route path="/step/:step" component={Steps} />
-                </div>
-            </BrowserRouter>
+            <Provider store={store}>
+                <ConnectedRouter history={history}>
+                    <div>
+                        <Route exact path="/" component={Home} />
+                        <Route path="/step/:step" component={Steps} />
+                        <Route path="/counter" component={Counter} />
+                    </div>
+                </ConnectedRouter>
+            </Provider>
         );
     }
 }

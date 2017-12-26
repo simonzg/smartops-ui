@@ -1,16 +1,5 @@
 import React, { Component } from "react";
-import {
-    Button,
-    Form,
-    FormGroup,
-    Label,
-    Input,
-    FormText,
-    Container,
-    Row,
-    col
-} from "reactstrap";
-import { BrowserRouter, Route, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 class AppRequirements extends Component {
     render() {
@@ -20,7 +9,7 @@ class AppRequirements extends Component {
                     <h1>Operational Requirements</h1>
                 </div>
                 <div className="form-group row">
-                    <label for="tail" className="label-blue col-12">
+                    <label htmlFor="tail" className="label-blue col-12">
                         Maximum Tail Latency
                     </label>
                     <div className="col-5">
@@ -32,7 +21,7 @@ class AppRequirements extends Component {
                     </div>
                 </div>
                 <div className="form-group row">
-                    <label for="error-rate" className="label-blue col-12">
+                    <label htmlFor="error-rate" className="label-blue col-12">
                         Maximum Error Rate
                     </label>
                     <div className="col-5">

@@ -1,6 +1,5 @@
 import React, { Component } from "react";
-import { Button, Container, col, ul, row } from "reactstrap";
-import { BrowserRouter, Route, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 class DryRun extends Component {
   render() {
@@ -112,7 +111,7 @@ class DryRun extends Component {
           </div>
         </div>
         <div className="action-footer">
-          <Link className="btn btn-main" to="/step/4">
+          <Link className="btn btn-main" to="/step/6">
             Next
           </Link>
         </div>

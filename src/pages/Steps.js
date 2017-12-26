@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import "../styles/App.css";
 import Navbar from "../components/Navbar";
 import GuideBar from "../components/GuideBar";
 import AppRequirements from "../components/AppRequirements";
@@ -8,7 +7,6 @@ import AppTopology from "../components/AppTopology";
 import AppTestPlan from "../components/AppTestPlan";
 import DryRun from "../components/DryRun";
 import DryrunResult from "../components/DryrunResult";
-import { BrowserRouter, Route, Link } from "react-router-dom";
 
 class Steps extends Component {
   constructor(props) {
@@ -17,14 +15,26 @@ class Steps extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    console.log("new props: ", nextProps);
     if (nextProps.hasOwnProperty("match")) {
-      this.setState({ step: nextProps.match.params.step });
+      this.setState({ step: parseInt(nextProps.match.params.step, 10) });
     }
   }
 
-  shouldComponentUpdate() {
-    return true;
+  getMainComponent(step) {
+    switch (step) {
+      case 2:
+        return <AppBlueprint />;
+      case 3:
+        return <AppTopology />;
+      case 4:
+        return <AppTestPlan />;
+      case 5:
+        return <DryRun />;
+      case 6:
+        return <DryrunResult />;
+      default:
+        return <AppRequirements />;
+    }
   }
 
   render() {
@@ -32,16 +42,7 @@ class Steps extends Component {
       <div>
         <Navbar />
         <GuideBar step={this.state.step} />
-        <BrowserRouter>
-          <div>
-            <Route path="/step/1" component={AppRequirements} />
-            <Route path="/step/2" component={AppBlueprint} />
-            <Route path="/step/3" component={AppTopology} />
-            <Route path="/step/4" component={AppTestPlan} />
-            <Route path="/Step/5" component={DryRun} />
-            <Route path="/Step/6" component={DryrunResult} />
-          </div>
-        </BrowserRouter>
+        {this.getMainComponent(this.state.step)}
       </div>
     );
   }

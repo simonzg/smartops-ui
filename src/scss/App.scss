@@ -8,26 +8,16 @@ $box-header: #bce0fd;
     background: $bg-blue;
 }
 
+.container-bg {
+    background-color: #f7f7f7;
+    padding: 20px;
+    padding-bottom: 100%;
+}
+
 .container.app-cover-container {
     padding-top: 40px;
     padding-bottom: 20px;
-
-    .modal-dialog {
-        .modal-content {
-            color: $border-blue;
-            padding-top: 20px;
-            padding-left: 20px;
-
-            .modal-header {
-                border-bottom: 1px solid white;
-            }
-
-            .modal-footer {
-                border-top: 1px solid white;
-                margin-left: 10px;
-            }
-        }
-    }
+    background-color: #f7f7f7;
 }
 
 .app-cover-create {
@@ -38,16 +28,18 @@ $box-header: #bce0fd;
     text-align: center;
     padding: 30px 0;
     margin-bottom: 20px;
+}
 
-    * {
-        color: $border-blue;
-    }
+* {
+    color: $border-blue;
+    font-size: 14px;
 }
 
 .app-cover {
     border-radius: 4px;
     border: 1px solid #e7e7e7;
     margin-bottom: 20px;
+    background-color: white;
     box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
 
     .header {
@@ -111,18 +103,21 @@ $box-header: #bce0fd;
     .form-title {
         &,
         h1 {
-            font-size: 30px;
+            font-size: 24px;
             font-weight: bold;
             color: #2699fb;
             margin-top: 50px;
             margin-bottom: 20px;
+            padding-bottom: 5px;
         }
     }
 
     .form-group {
         input {
-            border: 1px solid #2699fb;
+            border: 0.5px solid #2699fb;
             border-radius: 3px;
+            padding: 10px;
+            margin-bottom: 15px;
         }
 
         .btn-primary {
@@ -140,8 +135,8 @@ $box-header: #bce0fd;
             .input-title {
                 font-size: 16px;
                 color: #2699fb;
-                margin-top: 30px;
-                margin-bottom: 5px;
+                margin-top: 40px;
+                margin-bottom: 10px;
             }
         }
     }
@@ -149,9 +144,9 @@ $box-header: #bce0fd;
     .action-footer {
         margin-top: 40px;
         color: #2699fb;
+        padding: 10px 20px 10px 20px;
     }
 }
-
 // Colors
 $light-blue: #cfe8fc;
 $dark-blue: #2699fb;
@@ -161,11 +156,12 @@ $white: white;
 .guide-bar {
     z-index: -3;
     padding-left: 0;
+    background-color: white;
 
     li {
         display: inline-block;
-        width: 15%;
-        height: 80px;
+        width: 12%;
+        height: 100px;
         position: relative;
         text-align: center;
         cursor: pointer;
@@ -180,7 +176,7 @@ $white: white;
             border-radius: 100%;
             display: block;
             text-align: center;
-            margin: 18px auto;
+            margin: 20px auto;
         }
 
         &:after {
@@ -189,7 +185,7 @@ $white: white;
             width: 100%;
             height: 2px;
             background-color: $light-blue;
-            top: 25px;
+            top: 26px;
             left: calc(-50% + 7px);
             z-index: -2;
         }
@@ -202,27 +198,29 @@ $white: white;
             color: $dark-blue;
 
             .title {
+                font-size: 14px;
                 font-weight: bold;
             }
         }
 
         &.active:before {
-            width: 45px;
-            height: 45px;
+            width: 39px;
+            height: 39px;
             background: #0b7fff; // line-height: 30px;
-            border: 20px solid $light-blue;
+            border: 17px solid $light-blue;
             border-radius: 100%;
             margin: 0 auto 10px auto;
-            margin-top: 3px;
+            margin-top: 6px;
             z-index: 99;
         }
 
         .title {
             position: absolute;
-            top: 50px;
+            top: 60px;
             left: 0;
             width: 100%;
             text-align: center;
+            font-size: 14px;
             color: $dark-blue;
         }
     }
@@ -233,11 +231,22 @@ $white: white;
     }
 }
 
+.body-container-bg {
+    background-color: #f7f7f7;
+    padding-top: 40px;
+    padding-bottom: 100%;
+}
+
+body {
+    background-color: #f7f7f7;
+}
+
 #code-editor {
     width: 100%;
     height: 50%;
 }
 
+//app topology
 .topology-group {
     margin-top: 50px;
     padding-left: 0;
@@ -249,10 +258,10 @@ $white: white;
         position: relative;
 
         .title {
-            width: 150px;
-            height: 150px;
+            width: 120px;
+            height: 120px;
             color: #2699fb;
-            line-height: 150px;
+            line-height: 120px;
             border: 1px solid #2699fb;
             border-radius: 3%;
             display: block;
@@ -263,11 +272,11 @@ $white: white;
         .note {
             position: absolute;
             bottom: 1px;
-            height: 30px;
+            height: 28px;
             line-height: 30px;
             border-radius: 0 0 4px 4px;
             left: 1px;
-            width: 148px;
+            width: 118px;
             background: $light-blue;
             text-align: center;
             color: $dark-blue;
@@ -281,7 +290,7 @@ $white: white;
             height: 1px;
             background-color: #2699fb;
             top: 50%;
-            left: 40%;
+            left: 30%;
             z-index: -1;
         }
     }
@@ -298,6 +307,7 @@ $white: white;
 $border: #bce0fd;
 $dark: #848484;
 
+//dryrun result
 .result-table {
     ul.result-table-head {
         background: $light-blue;

@@ -1,18 +1,36 @@
 var express = require("express");
 var router = express.Router();
 
+let apps = [
+  {
+    updated_at: "2017-12-16 11:44:08",
+    created_at: "2017-12-16 11:43:06",
+    id: 1,
+    name: "app1",
+    status: { status: "CREATING_STEP_0", message: "" }
+  }
+];
 // List app
 router.get("/apps", function(req, res, next) {
-  res.json([
-    {
-      updated_at: "2017-12-16 11:44:08",
-      created_at: "2017-12-16 11:43:06",
-      id: 1,
-      name: "app1",
-      status: { status: "CREATING_STEP_0", message: "" }
-    }
-  ]);
+  res.json(apps);
 });
+
+// Create App
+router.post("/apps", (req, res, next) => {
+  let app = {
+    updated_at: new Date(),
+    created_at: new Date(),
+    id: apps.length + 1,
+    name: req.body.name,
+    status: {
+      status: "CREATING_STEP_0",
+      message: ""
+    }
+  };
+  apps.push(app);
+  res.json({});
+});
+//
 
 // set SLA
 router.put("/apps/:app_id/sla", (req, res, next) => {
