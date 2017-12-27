@@ -17,10 +17,11 @@ router.get("/apps", function(req, res, next) {
 
 // Create App
 router.post("/apps", (req, res, next) => {
+  let id = apps.length + 1;
   let app = {
     updated_at: new Date(),
     created_at: new Date(),
-    id: apps.length + 1,
+    id: id,
     name: req.body.name,
     status: {
       status: "CREATING_STEP_0",
@@ -28,7 +29,8 @@ router.post("/apps", (req, res, next) => {
     }
   };
   apps.push(app);
-  res.json({});
+  // CHANGED: return id instead of noting
+  res.json({ id: id });
 });
 //
 

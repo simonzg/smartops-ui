@@ -1,5 +1,7 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
+import { bindActionCreators } from "redux";
+import { connect } from "react-redux";
 
 import {
     FormGroup,
@@ -12,20 +14,35 @@ import {
     ModalFooter
 } from "reactstrap";
 
+import { list_apps, create_app } from "../modules/client";
+
 class AppCoverCreate extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            modal: false
+            modal: false,
+            value: ""
         };
 
         this.toggle = this.toggle.bind(this);
+        this.handleSubmit = this.handleSubmit.bind(this);
+        this.handleChange = this.handleChange.bind(this);
     }
 
     toggle() {
         this.setState({
             modal: !this.state.modal
         });
+    }
+
+    handleChange(event) {
+        this.setState({ value: event.target.value });
+    }
+
+    handleSubmit() {
+        this.props.create_app(this.state.value);
+        this.toggle();
+        this.props.list_apps();
     }
 
     render() {
@@ -44,15 +61,16 @@ class AppCoverCreate extends Component {
                                 className={this.props.className}
                             >
                                 <ModalHeader toggle={this.toggle}>
-                                    Creat New Application
+                                    Create New Application
                                 </ModalHeader>
 
                                 <ModalBody>
                                     <FormGroup>
-                                        <Label htmlFor="appname">
-                                            App Name
-                                        </Label>
-                                        <Input placeholder="" />
+                                        <Label>App Name</Label>
+                                        <Input
+                                            placeholder=""
+                                            onChange={this.handleChange}
+                                        />
                                     </FormGroup>
                                 </ModalBody>
                                 <ModalFooter>
@@ -64,15 +82,10 @@ class AppCoverCreate extends Component {
                                     </Button>
                                     <Button
                                         color="primary"
-                                        onClick={this.toggle}
+                                        onClick={this.handleSubmit}
                                     >
-                                        <Link
-                                            className="btn btn-main"
-                                            to="/step/1"
-                                        >
-                                            Create
-                                        </Link>
-                                    </Button>{" "}
+                                        Create
+                                    </Button>
                                 </ModalFooter>
                             </Modal>
                         </div>
@@ -83,4 +96,7 @@ class AppCoverCreate extends Component {
     }
 }
 
-export default AppCoverCreate;
+const mapDispatchToProps = dispatch =>
+    bindActionCreators({ list_apps, create_app }, dispatch);
+
+export default connect(null, mapDispatchToProps)(AppCoverCreate);

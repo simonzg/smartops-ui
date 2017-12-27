@@ -6,7 +6,7 @@ import { connect } from "react-redux";
 import { Button } from "reactstrap";
 
 // modules
-import { init } from "../modules/home";
+import { list_apps } from "../modules/client";
 
 // components
 import AppCoverCreate from "../components/AppCoverCreate";
@@ -14,10 +14,13 @@ import AppCover from "../components/AppCover";
 
 class Home extends Component {
   componentWillMount() {
-    this.props.init();
+    this.props.list_apps();
   }
+
   render() {
-    let appCovers = this.props.apps.map(app => <AppCover {...app} />);
+    let appCovers = this.props.apps.map((app, index) => (
+      <AppCover {...app} key={index} />
+    ));
 
     return (
       <div>
@@ -36,9 +39,10 @@ class Home extends Component {
 }
 
 const mapStateToProps = state => ({
-  apps: state.home.apps
+  apps: state.client.apps
 });
 
-const mapDispatchToProps = dispatch => bindActionCreators({ init }, dispatch);
+const mapDispatchToProps = dispatch =>
+  bindActionCreators({ list_apps }, dispatch);
 
 export default connect(mapStateToProps, mapDispatchToProps)(Home);
