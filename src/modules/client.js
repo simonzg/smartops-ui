@@ -2,15 +2,15 @@ import axios from "axios";
 
 const BASE = "http://localhost:8000";
 
-export const INIT = "home/INIT";
-export const INIT_SUCCESS = "home/INIT_SUCCESS";
-export const INIT_FAILURE = "home/INIT_FAILURE";
+export const LIST_APPS = "client/LIST_APPS";
+export const LIST_APPS_SUCCESS = "client/LIST_APPS_SUCCESS";
+export const LIST_APPS_FAILURE = "client/LIST_APPS_FAILURE";
 
-export const CREATE_APP = "home/CREATE_APP";
-export const CREATE_APP_SUCCESS = "home/CREATE_APP_SUCCESS";
-export const CREATE_APP_FAILURE = "home/CREATE_APP_FAILURE";
+export const CREATE_APP = "client/CREATE_APP";
+export const CREATE_APP_SUCCESS = "client/CREATE_APP_SUCCESS";
+export const CREATE_APP_FAILURE = "client/CREATE_APP_FAILURE";
 
-const events = [INIT, CREATE_APP];
+const events = [LIST_APPS, CREATE_APP];
 
 const list_appsState = {
   apps: [],
@@ -27,36 +27,37 @@ export default (state = list_appsState, action) => {
       loading: true
     };
   }
+
   if (action.type.includes("_SUCCESS")) {
-    if (action.type == INIT_SUCCESS) {
-      return {
-        ...state,
-        loading: false,
-        apps: action.data
-      };
-    } else {
-      return {
-        ...state,
-        loading: false,
-        data: action.data
-      };
+    let baseState = {
+      ...state,
+      loading: false
+    };
+    switch (action.type) {
+      case LIST_APPS_SUCCESS:
+        return Object.assign(baseState, { apps: action.data });
+
+      case CREATE_APP_SUCCESS:
+        return Object.assign(baseState, { apps: [...state.apps, action.data] });
+
+      default:
+        return Object.assign(baseState, { data: action.data });
     }
   }
+
   if (action.type.includes("_FAILURE")) {
-    if (action.type == INIT_FAILURE) {
-      return {
-        ...state,
-        loading: false,
-        error: action.error,
-        apps: []
-      };
-    } else {
-      return {
-        ...state,
-        loading: false,
-        data: {},
-        error: action.error
-      };
+    let baseState = {
+      ...state,
+      loading: false,
+      error: action.error
+    };
+
+    switch (action.type) {
+      case LIST_APPS_FAILURE:
+        return Object.assign(baseState, { apps: [] });
+
+      default:
+        return Object.assign(baseState, { data: {} });
     }
   }
 
@@ -80,11 +81,11 @@ const callAPI = (dispatch, base_type, verb, url, payload = {}) => {
   try {
     axios(config)
       .then(response => {
-        dispatch({ type: base_type + "_SUCCESS", data: response.data });
-        if (base_type == CREATE_APP) {
-          // after create_app, trigger lis  t_apps action
-          // list_apps()(dispatch);
-        }
+        dispatch({
+          type: base_type + "_SUCCESS",
+          data: response.data,
+          payload: payload
+        });
       })
       .catch(error => {
         dispatch({ type: base_type + "_FAILURE", error: error.message });
@@ -110,7 +111,7 @@ const callAPI = (dispatch, base_type, verb, url, payload = {}) => {
 
 export const list_apps = () => {
   return dispatch => {
-    callAPI(dispatch, INIT, "get", "/apps");
+    callAPI(dispatch, LIST_APPS, "get", "/apps");
   };
 };
 

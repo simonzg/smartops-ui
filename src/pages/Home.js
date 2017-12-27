@@ -22,6 +22,8 @@ class Home extends Component {
       <AppCover {...app} key={index} />
     ));
 
+    console.log("apps: ", this.props.apps);
+
     return (
       <div>
         <Navbar />

@@ -30,7 +30,7 @@ router.post("/apps", (req, res, next) => {
   };
   apps.push(app);
   // CHANGED: return id instead of noting
-  res.json({ id: id });
+  res.json(app);
 });
 //
 
