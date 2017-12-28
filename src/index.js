@@ -19,7 +19,7 @@ class App extends Component {
                 <ConnectedRouter history={history}>
                     <div>
                         <Route exact path="/" component={Home} />
-                        <Route path="/step/:step" component={Steps} />
+                        <Route path="/:app_id/step/:step" component={Steps} />
                         <Route path="/counter" component={Counter} />
                     </div>
                 </ConnectedRouter>

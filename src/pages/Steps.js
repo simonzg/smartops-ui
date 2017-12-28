@@ -11,7 +11,7 @@ import DryrunResult from "../components/DryrunResult";
 class Steps extends Component {
   constructor(props) {
     super(props);
-    this.state = { step: 1 };
+    this.state = { step: parseInt(props.match.params.step, 10) };
   }
 
   componentWillReceiveProps(nextProps) {
