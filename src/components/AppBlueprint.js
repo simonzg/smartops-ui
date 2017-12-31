@@ -3,12 +3,55 @@ import React, { Component } from "react";
 import { render } from "react-dom";
 import brace from "brace";
 import AceEditor from "react-ace";
-import { Link } from "react-router-dom";
 import "brace/mode/yaml";
 import "brace/theme/monokai";
+import { bindActionCreators } from "redux";
+import { connect } from "react-redux";
+import { Button } from "reactstrap";
+import { Link } from "react-router-dom";
+
+import { load_blueprint, save_blueprint } from "../modules/client";
+import { push } from "react-router-redux";
 
 class AppBlueprint extends Component {
+    constructor(props) {
+        super(props);
+        this.state = { yml: "" };
+
+        this.onChange = this.onChange.bind(this);
+        this.handleSubmit = this.handleSubmit.bind(this);
+    }
+
+    componentWillMount() {
+        this.props.load_blueprint(this.props.app_id);
+    }
+
+    componentWillReceiveProps(nextProps) {
+        console.log("recved props: ", nextProps);
+        if (nextProps.hasOwnProperty("yml")) {
+            this.setState({ yml: nextProps.yml });
+        }
+
+        if (nextProps.status && nextProps.status == "success") {
+            this.props.push(
+                `/${this.props.app_id}/step/${this.props.step + 1}`
+            );
+        }
+    }
+
+    onChange(newValue) {
+        console.log("new value", newValue);
+        this.setState({ yml: newValue });
+    }
+
+    handleSubmit() {
+        this.props.save_blueprint(this.props.app_id, {
+            content: this.state.yml
+        });
+    }
+
     render() {
+        console.log("render");
         return (
             <div className="container body-container">
                 <div className="form-title">
@@ -19,40 +62,18 @@ class AppBlueprint extends Component {
                     mode="yaml"
                     theme="monokai"
                     name="editor"
-                    value={`
---- !clarkevans.com/^invoice
-invoice: 34843
-date   : 2001-01-23
-bill-to: &id001
-    given  : Chris
-    family : Dumars
-    address:
-        lines: |
-            458 Walkman Dr.
-            Suite #292
-        city    : Royal Oak
-        state   : MI
-        postal  : 48046
-ship-to: *id001
-product:
-    - sku         : BL394D
-      quantity    : 4
-      description : Basketball
-      price       : 450.00
-    - sku         : BL4438H
-      quantity    : 1
-      description : Super Hoop
-      price       : 2392.00
-tax  : 251.42
-total: 4443.52
-comments: >
-    Late afternoon is best.
-    Backup contact is Nancy
-    Billsmer @ 338-4338.`}
+                    value={this.state.yml}
                     editorProps={{ $blockScrolling: true }}
                     style={{ width: "100%", height: "500px" }}
+                    onChange={this.onChange}
                 />
                 <div className="action-footer">
+                    <Button
+                        className="btn btn-main"
+                        onClick={this.handleSubmit}
+                    >
+                        Save
+                    </Button>
                     <Link className="btn btn-main" to="/step/3">
                         Next
                     </Link>
@@ -62,4 +83,15 @@ comments: >
     }
 }
 
-export default AppBlueprint;
+const mapStateToProps = state => {
+    console.log("new state: ", state);
+    return {
+        yml: state.client.yml,
+        status: state.client.status
+    };
+};
+
+const mapDispatchToProps = dispatch =>
+    bindActionCreators({ load_blueprint, save_blueprint, push }, dispatch);
+
+export default connect(mapStateToProps, mapDispatchToProps)(AppBlueprint);

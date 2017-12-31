@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { Link } from "react-router-dom";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
+import { push } from "react-router-redux";
 
 import {
     FormGroup,
@@ -43,6 +44,13 @@ class AppCoverCreate extends Component {
         this.props.create_app(this.state.value);
         this.toggle();
         this.props.list_apps();
+    }
+
+    componentWillReceiveProps(nextProps) {
+        console.log("recv:", nextProps);
+        if (nextProps.status && nextProps.status == "success") {
+            this.props.push(`/${nextProps.data.id}/step/1`);
+        }
     }
 
     render() {
@@ -96,7 +104,12 @@ class AppCoverCreate extends Component {
     }
 }
 
-const mapDispatchToProps = dispatch =>
-    bindActionCreators({ list_apps, create_app }, dispatch);
+const mapStateToProps = state => ({
+    status: state.client.status,
+    data: state.client.data
+});
 
-export default connect(null, mapDispatchToProps)(AppCoverCreate);
+const mapDispatchToProps = dispatch =>
+    bindActionCreators({ list_apps, create_app, push }, dispatch);
+
+export default connect(mapStateToProps, mapDispatchToProps)(AppCoverCreate);

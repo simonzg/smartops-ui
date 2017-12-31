@@ -5,6 +5,11 @@ import {
     DropdownMenu,
     DropdownItem
 } from "reactstrap";
+import { bindActionCreators } from "redux";
+import { connect } from "react-redux";
+import { Button } from "reactstrap";
+import { load_blueprint_json } from "../modules/client";
+
 import { Link } from "react-router-dom";
 
 class AppTopology extends Component {
@@ -21,6 +26,10 @@ class AppTopology extends Component {
         this.setState({
             dropdownOpen: !this.state.dropdownOpen
         });
+    }
+
+    componentWillMount() {
+        this.props.load_blueprint_json(this.props.app_id);
     }
 
     render() {
@@ -104,4 +113,9 @@ class AppTopology extends Component {
     }
 }
 
-export default AppTopology;
+const mapStateToProps = state => ({});
+
+const mapDispatchToProps = dispatch =>
+    bindActionCreators({ load_blueprint_json }, dispatch);
+
+export default connect(null, mapDispatchToProps)(AppTopology);

@@ -11,7 +11,10 @@ import DryrunResult from "../components/DryrunResult";
 class Steps extends Component {
   constructor(props) {
     super(props);
-    this.state = { step: parseInt(props.match.params.step, 10) };
+    this.state = {
+      step: parseInt(props.match.params.step, 10),
+      app_id: props.match.params.app_id
+    };
   }
 
   componentWillReceiveProps(nextProps) {
@@ -20,20 +23,20 @@ class Steps extends Component {
     }
   }
 
-  getMainComponent(step) {
+  getMainComponent(app_id, step) {
     switch (step) {
       case 2:
-        return <AppBlueprint />;
+        return <AppBlueprint app_id={app_id} step={step} />;
       case 3:
-        return <AppTopology />;
+        return <AppTopology app_id={app_id} step={step} />;
       case 4:
-        return <AppTestPlan />;
+        return <AppTestPlan app_id={app_id} step={step} />;
       case 5:
-        return <DryRun />;
+        return <DryRun app_id={app_id} step={step} />;
       case 6:
-        return <DryrunResult />;
+        return <DryrunResult app_id={app_id} step={step} />;
       default:
-        return <AppRequirements />;
+        return <AppRequirements app_id={app_id} step={1} />;
     }
   }
 
@@ -42,7 +45,7 @@ class Steps extends Component {
       <div>
         <Navbar />
         <GuideBar step={this.state.step} />
-        {this.getMainComponent(this.state.step)}
+        {this.getMainComponent(this.state.app_id, this.state.step)}
       </div>
     );
   }

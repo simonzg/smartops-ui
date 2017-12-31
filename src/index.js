@@ -8,7 +8,7 @@ import { Provider } from "react-redux";
 import { ConnectedRouter } from "react-router-redux";
 import store, { history } from "./store";
 
-import Home from "./pages/Home";
+import Home from "./containers/Home";
 import Steps from "./pages/Steps";
 import Counter from "./containers/Counter";
 
