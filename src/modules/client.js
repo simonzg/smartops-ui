@@ -1,7 +1,7 @@
 import axios from "axios";
 import { push } from "react-router-redux";
 
-const BASE = "http://192.168.1.194:8080";
+const BASE = "http://10.145.88.67:8000";
 
 export const LIST_APPS = "client/LIST_APPS";
 export const LIST_APPS_SUCCESS = "client/LIST_APPS_SUCCESS";
@@ -56,7 +56,8 @@ export default (state = list_appsState, action) => {
   if (action.type.includes("_SUCCESS")) {
     let baseState = {
       ...state,
-      loading: false
+      loading: false,
+      error: ""
     };
     if (action.type.includes("CREATE_") || action.type.includes("SAVE_")) {
       console.log("SAVE_OR_CREATE");
@@ -193,6 +194,6 @@ export const save_blueprint = (app_id, payload) => {
 export const load_blueprint_json = app_id => {
   let url = `/apps/${app_id}/blueprint`;
   return dispatch => {
-    callAPI(dispatch, LOAD_BLUEPRINT, "get", url);
+    callAPI(dispatch, LOAD_BLUEPRINT_JSON, "get", url);
   };
 };

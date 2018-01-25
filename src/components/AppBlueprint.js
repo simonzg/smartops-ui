@@ -51,12 +51,9 @@ class AppBlueprint extends Component {
     }
 
     render() {
-        console.log("render");
         return (
             <div className="container body-container">
-                <div className="form-title">
-                    <h1>Application Blue Print</h1>
-                </div>
+                <div className="page-title"> Application Blue Print </div>
 
                 <AceEditor
                     mode="yaml"
@@ -72,11 +69,8 @@ class AppBlueprint extends Component {
                         className="btn btn-main"
                         onClick={this.handleSubmit}
                     >
-                        Save
-                    </Button>
-                    <Link className="btn btn-main" to="/step/3">
                         Next
-                    </Link>
+                    </Button>
                 </div>
             </div>
         );

@@ -39,9 +39,7 @@ class AppRequirements extends Component {
     render() {
         return (
             <div className="container body-container">
-                <div className="form-title">
-                    <h1>Operational Requirements</h1>
-                </div>
+                <div className="page-title"> Operational Requirements</div>
                 <div className="form-group row">
                     <label htmlFor="tail" className="label-blue col-12">
                         Maximum Tail Latency

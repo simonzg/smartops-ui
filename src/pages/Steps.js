@@ -44,7 +44,7 @@ class Steps extends Component {
     return (
       <div>
         <Navbar />
-        <GuideBar step={this.state.step} />
+        <GuideBar step={this.state.step} app_id={this.state.app_id} />
         {this.getMainComponent(this.state.app_id, this.state.step)}
       </div>
     );

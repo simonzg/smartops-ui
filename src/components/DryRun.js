@@ -5,10 +5,10 @@ class DryRun extends Component {
   render() {
     return (
       <div className="container body-container">
-        <h1 className="form-title">Dry Run Plan</h1>
+        <h1 className="page-title">Dry Run Plan</h1>
         <div className="row">
           <div className="plan-form col-8">
-            <div className="form-title row">
+            <div className="page-title row">
               <div className="col-12">Pod:web</div>
             </div>
             <div className="row">
@@ -71,7 +71,7 @@ class DryRun extends Component {
                 <div className="stats">512</div>
               </div>
             </div>
-            <div className="form-title row">
+            <div className="page-title row">
               <div className="col-12">Pod:Database</div>
             </div>
             <div className="row">

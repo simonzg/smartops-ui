@@ -11,6 +11,7 @@ import store, { history } from "./store";
 import Home from "./containers/Home";
 import Steps from "./pages/Steps";
 import Counter from "./containers/Counter";
+import Notification from "./containers/Notification";
 
 class App extends Component {
     render() {
@@ -21,6 +22,7 @@ class App extends Component {
                         <Route exact path="/" component={Home} />
                         <Route path="/:app_id/step/:step" component={Steps} />
                         <Route path="/counter" component={Counter} />
+                        <Notification />
                     </div>
                 </ConnectedRouter>
             </Provider>

@@ -5,7 +5,7 @@ class DryrunResult extends Component {
   render() {
     return (
       <div className="container body-container">
-        <h1 className="form-title">Dry Run Result</h1>
+        <h1 className="page-title">Dry Run Result</h1>
         <Button Color="link">Download</Button>
         <div className="col-10 result-table" style={{ "padding-left": 0 }}>
           <ul className="result-table-head">
@@ -77,7 +77,7 @@ class DryrunResult extends Component {
                     />
                   </div>
                 </div>
-              </div>{" "}
+              </div>
             </div>
           </div>
         </div>

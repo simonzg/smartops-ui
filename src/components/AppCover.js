@@ -13,7 +13,7 @@ class AppCover extends Component {
                         <Link className="name" to={url}>
                             {this.props.name}
                         </Link>
-                        <div className="row">
+                        <div className="row clearfix">
                             <div className="col-md-4">Service</div>
                             <div className="col-md-4">Container</div>
                             <div className="col-md-4">Pod</div>

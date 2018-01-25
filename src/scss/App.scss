@@ -11,7 +11,6 @@ $box-header: #bce0fd;
 .container-bg {
     background-color: #f7f7f7;
     padding: 20px;
-    padding-bottom: 100%;
 }
 
 .container.app-cover-container {
@@ -57,6 +56,9 @@ $box-header: #bce0fd;
             font-size: 20px;
             padding: 10px 0;
             font-weight: bold;
+        }
+        .row {
+            margin-top: 25px;
         }
 
         * {
@@ -143,6 +145,7 @@ $box-header: #bce0fd;
 
     .action-footer {
         margin-top: 40px;
+        margin-bottom: 20px;
         color: #2699fb;
         padding: 0;
     }
@@ -168,6 +171,7 @@ $white: white;
         z-index: 0;
 
         &:before {
+            // circle
             content: "";
             width: 15px;
             height: 15px;
@@ -177,41 +181,23 @@ $white: white;
             display: block;
             text-align: center;
             margin: 20px auto;
+            z-index: 5;
         }
 
         &:after {
+            // line
             content: "";
             position: absolute;
-            width: 100%;
+            width: 95%;
             height: 2px;
             background-color: $light-blue;
             top: 26px;
-            left: calc(-50% + 7px);
-            z-index: -2;
+            right: 50%;
+            z-index: -5;
         }
 
         &:first-child:after {
             content: none;
-        }
-
-        &.active {
-            color: $dark-blue;
-
-            .title {
-                font-size: 14px;
-                font-weight: bold;
-            }
-        }
-
-        &.active:before {
-            width: 39px;
-            height: 39px;
-            background: #0b7fff; // line-height: 30px;
-            border: 17px solid $light-blue;
-            border-radius: 100%;
-            margin: 0 auto 10px auto;
-            margin-top: 6px;
-            z-index: 99;
         }
 
         .title {
@@ -225,9 +211,46 @@ $white: white;
         }
     }
 
+    li.active {
+        color: $dark-blue;
+
+        .title {
+            font-size: 14px;
+        }
+        &:before {
+            width: 39px;
+            height: 39px;
+            background: #0b7fff; // line-height: 30px;
+            border: 17px solid $light-blue;
+            border-radius: 100%;
+            margin: 0 auto 10px auto;
+            margin-top: 6px;
+            z-index: 99;
+        }
+    }
+
+    li.current {
+        color: $dark-blue;
+
+        .title {
+            font-size: 14px;
+            font-weight: bold;
+        }
+        &:before {
+            width: 39px;
+            height: 39px;
+            background: #0b7fff; // line-height: 30px;
+            border: 17px solid #eef6fd;
+            border-radius: 100%;
+            margin: 0 auto 10px auto;
+            margin-top: 6px;
+            z-index: 99;
+        }
+    }
+
     li.active + li:after {
         background-color: $dark-blue;
-        left: calc(-50% + 23px);
+        left: calc(-50% + 19px);
     }
 }
 
@@ -352,6 +375,13 @@ $dark: #848484;
     }
 }
 
+.page-title {
+    color: $border-blue;
+    font-weight: bold;
+    font-size: 20px;
+    margin: 25px 0 20px 0;
+}
+
 //dryrun plan
 .plan-form {
     background: white;
@@ -387,5 +417,44 @@ $dark: #848484;
 
     .stats {
         padding: 5px 0;
+    }
+}
+
+.notification {
+    position: fixed;
+    bottom: -30px;
+    left: 0;
+    width: 100%;
+    height: 30px;
+    background: #4caf50;
+    color: white;
+    text-align: center;
+    z-index: 999;
+    transform: translateY(0px);
+    animation: slideUp 1s 1s 1 ease forwards;
+}
+
+.notification.show {
+    transition: all 0.5s ease-out;
+}
+
+.notification-error {
+    @extend .notification;
+    background: #f44336;
+}
+
+.notification-success {
+    @extend .notification;
+    background: #4caf50;
+}
+
+@keyframes slideUp {
+    0%,
+    100% {
+        transform: translateY(0px);
+    }
+    10%,
+    90% {
+        transform: translateY(30px);
     }
 }
