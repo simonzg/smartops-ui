@@ -27,6 +27,9 @@ export const LOAD_BLUEPRINT_JSON = "client/LOAD_BLUEPRINT_JSON";
 export const LOAD_BLUEPRINT_JSON_SUCCESS = "client/LOAD_BLUEPRINT_JSON_SUCCESS";
 export const LOAD_BLUEPRINT_JSON_FAILURE = "client/LOAD_BLUEPRINT_JSON_FAILURE";
 
+export const NOTIFICATION = "client/NOTIFICATION";
+export const CLEAR_NOTIFICATION = "client/CLEAR_NOTIFICATION";
+
 const events = [
   LIST_APPS,
   CREATE_APP,
@@ -59,6 +62,8 @@ export default (state = list_appsState, action) => {
       loading: false,
       error: ""
     };
+
+    // save or create
     if (action.type.includes("CREATE_") || action.type.includes("SAVE_")) {
       console.log("SAVE_OR_CREATE");
       baseState = {
@@ -67,6 +72,8 @@ export default (state = list_appsState, action) => {
         status: "success"
       };
     }
+
+    // ajax call success
     switch (action.type) {
       case LIST_APPS_SUCCESS:
         return Object.assign(baseState, {
@@ -91,6 +98,7 @@ export default (state = list_appsState, action) => {
     }
   }
 
+  // ajax call failure
   if (action.type.includes("_FAILURE")) {
     let baseState = {
       ...state,
@@ -106,6 +114,14 @@ export default (state = list_appsState, action) => {
       default:
         return Object.assign(baseState, { data: {} });
     }
+  }
+
+  // notification
+  switch (action.type) {
+    case NOTIFICATION:
+      return { ...state, error: action.error };
+    case CLEAR_NOTIFICATION:
+      return { ...state, error: "" };
   }
 
   return state;
@@ -129,6 +145,14 @@ const callAPI = (dispatch, base_type, verb, url, payload = {}) => {
     axios(config)
       .then(response => {
         let type = base_type + "_SUCCESS";
+        console.log(
+          verb,
+          url,
+          "\npayload = ",
+          JSON.stringify(payload),
+          "\nresponse.data = ",
+          JSON.stringify(response.data)
+        );
         dispatch({
           type: type,
           data: response.data,
@@ -136,7 +160,16 @@ const callAPI = (dispatch, base_type, verb, url, payload = {}) => {
         });
       })
       .catch(error => {
+        console.log(
+          verb,
+          url,
+          "\npayload = ",
+          JSON.stringify(payload),
+          "\nerror = ",
+          JSON.stringify(error)
+        );
         dispatch({ type: base_type + "_FAILURE", error: error.message });
+        dispatch({ type: NOTIFICATION, error: error.message });
       });
   } catch (error) {
     let message = "";
@@ -195,5 +228,17 @@ export const load_blueprint_json = app_id => {
   let url = `/apps/${app_id}/blueprint`;
   return dispatch => {
     callAPI(dispatch, LOAD_BLUEPRINT_JSON, "get", url);
+  };
+};
+
+export const show_notification = err => {
+  return dispatch => {
+    dispatch({ type: NOTIFICATION, error: err });
+  };
+};
+
+export const clear_notification = () => {
+  return dispatch => {
+    dispatch({ type: CLEAR_NOTIFICATION });
   };
 };

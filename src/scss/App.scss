@@ -101,6 +101,7 @@ $box-header: #bce0fd;
 .body-container {
     //margin-left: 300px;
     font-family: arial;
+    padding: 0 30px;
 
     .form-title {
         &,
@@ -144,7 +145,7 @@ $box-header: #bce0fd;
     }
 
     .action-footer {
-        margin-top: 40px;
+        margin-top: 15px;
         margin-bottom: 20px;
         color: #2699fb;
         padding: 0;
@@ -163,7 +164,7 @@ $white: white;
 
     li {
         display: inline-block;
-        width: 12%;
+        width: 14%;
         height: 100px;
         position: relative;
         text-align: center;
@@ -422,30 +423,19 @@ $dark: #848484;
 
 .notification {
     position: fixed;
-    bottom: -30px;
+    bottom: -52px;
     left: 0;
     width: 100%;
-    height: 30px;
-    background: #4caf50;
+    height: 52px;
     color: white;
     text-align: center;
     z-index: 999;
     transform: translateY(0px);
-    animation: slideUp 1s 1s 1 ease forwards;
+    animation: slideUp 3s 0.1s 1 ease forwards;
 }
 
 .notification.show {
     transition: all 0.5s ease-out;
-}
-
-.notification-error {
-    @extend .notification;
-    background: #f44336;
-}
-
-.notification-success {
-    @extend .notification;
-    background: #4caf50;
 }
 
 @keyframes slideUp {
@@ -455,6 +445,6 @@ $dark: #848484;
     }
     10%,
     90% {
-        transform: translateY(30px);
+        transform: translateY(-52px);
     }
 }

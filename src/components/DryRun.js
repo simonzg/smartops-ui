@@ -112,7 +112,7 @@ class DryRun extends Component {
         </div>
         <div className="action-footer">
           <Link className="btn btn-main" to="/step/6">
-            Next
+            Run
           </Link>
         </div>
       </div>

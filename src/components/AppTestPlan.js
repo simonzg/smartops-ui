@@ -65,7 +65,7 @@ class AppTestPlan extends Component {
                         </FormGroup>
                     </div>
 
-                    <div className="col-9">
+                    <div className="col-7">
                         <FormGroup>
                             <Label>Url</Label>
                             <Input

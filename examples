@@ -1,0 +1,217 @@
+put /apps/2/sla 
+payload =  {"sla":{"latency":"2","error_rate":"2"}} 
+response.data =  {"latency":2,"app_id":2,"id":1,"error_rate":2}
+
+----------------------------
+
+get /apps/2/raw_blueprint 
+payload =  {} 
+response.data =  "--- \napiVersion: v1\nkind: Secret\nmetadata:\n  name: dockerhub.registry\ndata:\n  .dockerconfigjson: eyAiYXV0aHMiOiB7ICJodHRwczovL2luZGV4LmRvY2tlci5pby92MS8iOiB7ICJhdXRoIjogIlltbHNiSGw2YUdGdVp6SXdNVEE2U0ZkNmFEZ3lPREl4UUE9PSIgfSB9IH0K\ntype: kubernetes.io/dockerconfigjson\n---\n# A headless service to create DNS records\napiVersion: v1\nkind: Service\nmetadata:\n  annotations:\n    service.alpha.kubernetes.io/tolerate-unready-endpoints: true\n  name: db\n  namespace: acmeair\n  labels:\n    app: mysql\nspec:\n  ports:\n  - port: 3306\n    name: mysql\n  # *.galear.default.svc.cluster.local\n  clusterIP: None\n  selector:\n    app: mysql\n---\napiVersion: apps/v1beta1\nkind: StatefulSet\nmetadata:\n  name: mysql\n  namespace: acmeair\nspec:\n  serviceName: db\n  replicas: 3\n  template:\n    metadata:\n      labels:\n        app: mysql\n      annotations:\n        pod.alpha.kubernetes.io/init-containers: '[\n            {\n                \"name\": \"install\",\n                \"image\": \"10.145.88.66:5000/demo/smartops/webaccess-analyzer\",\n                \"args\": [\"--work-dir=/work-dir\"],\n                \"volumeMounts\": [\n                    {\n                        \"name\": \"workdir\",\n                        \"mountPath\": \"/work-dir\"\n                    },\n                    {\n                        \"name\": \"config\",\n                        \"mountPath\": \"/etc/mysql\"\n                    }\n                ]\n            },\n            {\n                \"name\": \"bootstrap\",\n                \"image\": \"10.145.88.146:5000/demo/debian:jessie\",\n                \"command\": [\"/work-dir/peer-finder\"],\n                \"args\": [\"-on-start=\\\"/work-dir/on-start.sh\\\"\", \"-service=db\"],\n                \"env\": [\n                  {\n                      \"name\": \"POD_NAMESPACE\",\n                      \"valueFrom\": {\n                          \"fieldRef\": {\n                              \"apiVersion\": \"v1\",\n                              \"fieldPath\": \"metadata.namespace\"\n                          }\n                      }\n                   }\n                ],\n                \"volumeMounts\": [\n                    {\n                        \"name\": \"workdir\",\n                        \"mountPath\": \"/work-dir\"\n                    },\n                    {\n                        \"name\": \"config\",\n                        \"mountPath\": \"/etc/mysql\"\n                    }\n                ]\n            }\n        ]'\n    spec:\n      nodeSelector:\n        stack: acmeair\n      containers:\n      - name: mysql\n        image: 10.145.88.66:5000/demo/mysql-galera\n        ports:\n        - containerPort: 3306\n          name: mysql\n        - containerPort: 4444\n          name: sst\n        - containerPort: 4567\n          name: replication\n        - containerPort: 4568\n          name: ist\n        args:\n        - --defaults-file=/etc/mysql/my-galera.cnf\n        - --user=root\n        readinessProbe:\n          # TODO: If docker exec is buggy just use gcr.io/google_containers/mysql-healthz:1.0\n          exec:\n            command:\n            - sh\n            - -c\n            - mysql -u root -e 'show databases;'\n          initialDelaySeconds: 15\n          timeoutSeconds: 5\n          successThreshold: 2\n        volumeMounts:\n        - name: datadir\n          mountPath: /var/lib/\n        - name: config\n          mountPath: /etc/mysql\n      volumes:\n      - name: config\n        emptyDir: {}\n      - name: workdir\n        emptyDir: {}\n      - name: datadir\n        emptyDir: {}\n  # volumeClaimTemplates:\n  # - metadata:\n  #     name: datadir\n  #     #annotations:\n  #     #  volume.beta.kubernetes.io/storage-class: example-nfs\n  #   spec:\n  #     accessModes: [ ReadWriteOnce ]\n  #     resources:\n  #       requests:\n  #         storage: 1Gi\n---\napiVersion: batch/v1\nkind: Job\nmetadata:\n  name: acmeairdbloader\n  namespace: acmeair\nspec:\n  template:\n    metadata:\n      name: acmeair-dbloader\n    spec:\n      restartPolicy: Never\n      imagePullSecrets:\n      - name: dockerhub.registry\n      nodeSelector:\n        stack: acmeair\n      containers:\n      - name: acmeair-dbloader\n        image: 10.145.88.66:5000/demo/smartops/mysql-loader\n        env:\n          - name: MYSQL_PORT_3306_TCP_ADDR\n            value: db\n          - name: MYSQL_ENV_MYSQL_ROOT_PASSWORD\n            value: root\n---\napiVersion: v1\nkind: Service\nmetadata:\n  name: acmeairapp\n  namespace: acmeair\nspec:\n  ports:\n  - port: 8080\n    targetPort: 8080\n    protocol: TCP\n    name: http\n  selector:\n    name: webpods\n---\napiVersion: v1\nkind: ReplicationController\nmetadata:\n  name: webrc\n  namespace: acmeair\nspec:\n  replicas: 1\n  selector:\n    name: webpods\n  template:\n    metadata:\n      labels:\n        name: webpods\n        tier: frontend\n    spec:\n      restartPolicy: Always\n      imagePullSecrets:\n      - name: dockerhub.registry\n      nodeSelector:\n        stack: acmeair\n      # nodeSelector:\n      #   eip : unbonded\n      #   region: cn-north-1\n      #   provider: hwcloud\n      #   stack: app1_dryrun\n      containers:\n      - image: 10.145.88.66:5000/demo/smartops/apps_acmeair\n        name: web\n        ports:\n        - containerPort: 8080\n---\napiVersion: v1\nkind: Service\nmetadata:\n  name: nginx\n  namespace: acmeair\nspec:\n  type: NodePort\n  ports:\n  - port: 80\n    targetPort: 80\n    nodePort: 30180\n    protocol: TCP\n    name: nginx0\n  selector:\n    name: nginxpo\n---\napiVersion: v1\nkind: ReplicationController\nmetadata:\n  name: nginxrc\n  namespace: acmeair\nspec:\n  replicas: 1\n  selector:\n    name: nginxpo\n  template:\n    metadata:\n      labels:\n        name: nginxpo\n    spec:\n      restartPolicy: Always\n      imagePullSecrets:\n      - name: dockerhub.registry\n      nodeSelector:\n        stack: acmeair\n      # nodeSelector:\n      #   eip : bonded\n      #   region: cn-north-1\n      #   provider: hwcloud\n      #   stack: app1_dryrun\n      containers:\n      - name: nginx\n        image: 10.145.88.66:5000/demo/smartops/webaccess-analyzer:0.4\n        env:\n        - name: BACKEND_SVC_IP\n          value: acmeairapp\n        - name: BACKEND_SVC_PORT\n          value: 8080\n        - name: INFLUXDB_URL\n          #value: https://influxdb.autoshift.us\n          value: http://influxdb.default:8086\n        - name: INFLUXDB_AUTH\n          value: autoshift:influx4autoshift\n        - name: KAFKA_BOOTSTRAP_SERVERS\n          value: kafka.default.svc.cluster.local:9092\n        - name: APP_NAME\n          value: acmeair-\n        resources:\n          requests:\n            cpu: 500m\n            memory: 512Mi\n        volumeMounts:\n        - name: nginxdata\n          mountPath: /var/log/nginx/\n        imagePullPolicy: Always\n        ports:\n        - containerPort: 80\n        - containerPort: 443\n      volumes:\n      - name: nginxdata\n        hostPath:\n          path: /var/nginx-out/log/" 
+
+----------------------------
+
+put /apps/2/blueprint 
+payload =  {"content":"--- \napiVersion: v1\nkind: Secret\nmetadata:\n  name: dockerhub.registry\ndata:\n  .dockerconfigjson: eyAiYXV0aHMiOiB7ICJodHRwczovL2luZGV4LmRvY2tlci5pby92MS8iOiB7ICJhdXRoIjogIlltbHNiSGw2YUdGdVp6SXdNVEE2U0ZkNmFEZ3lPREl4UUE9PSIgfSB9IH0K\ntype: kubernetes.io/dockerconfigjson\n---\n# A headless service to create DNS records\napiVersion: v1\nkind: Service\nmetadata:\n  annotations:\n    service.alpha.kubernetes.io/tolerate-unready-endpoints: true\n  name: db\n  namespace: acmeair\n  labels:\n    app: mysql\nspec:\n  ports:\n  - port: 3306\n    name: mysql\n  # *.galear.default.svc.cluster.local\n  clusterIP: None\n  selector:\n    app: mysql\n---\napiVersion: apps/v1beta1\nkind: StatefulSet\nmetadata:\n  name: mysql\n  namespace: acmeair\nspec:\n  serviceName: db\n  replicas: 3\n  template:\n    metadata:\n      labels:\n        app: mysql\n      annotations:\n        pod.alpha.kubernetes.io/init-containers: '[\n            {\n                \"name\": \"install\",\n                \"image\": \"10.145.88.66:5000/demo/smartops/webaccess-analyzer\",\n                \"args\": [\"--work-dir=/work-dir\"],\n                \"volumeMounts\": [\n                    {\n                        \"name\": \"workdir\",\n                        \"mountPath\": \"/work-dir\"\n                    },\n                    {\n                        \"name\": \"config\",\n                        \"mountPath\": \"/etc/mysql\"\n                    }\n                ]\n            },\n            {\n                \"name\": \"bootstrap\",\n                \"image\": \"10.145.88.146:5000/demo/debian:jessie\",\n                \"command\": [\"/work-dir/peer-finder\"],\n                \"args\": [\"-on-start=\\\"/work-dir/on-start.sh\\\"\", \"-service=db\"],\n                \"env\": [\n                  {\n                      \"name\": \"POD_NAMESPACE\",\n                      \"valueFrom\": {\n                          \"fieldRef\": {\n                              \"apiVersion\": \"v1\",\n                              \"fieldPath\": \"metadata.namespace\"\n                          }\n                      }\n                   }\n                ],\n                \"volumeMounts\": [\n                    {\n                        \"name\": \"workdir\",\n                        \"mountPath\": \"/work-dir\"\n                    },\n                    {\n                        \"name\": \"config\",\n                        \"mountPath\": \"/etc/mysql\"\n                    }\n                ]\n            }\n        ]'\n    spec:\n      nodeSelector:\n        stack: acmeair\n      containers:\n      - name: mysql\n        image: 10.145.88.66:5000/demo/mysql-galera\n        ports:\n        - containerPort: 3306\n          name: mysql\n        - containerPort: 4444\n          name: sst\n        - containerPort: 4567\n          name: replication\n        - containerPort: 4568\n          name: ist\n        args:\n        - --defaults-file=/etc/mysql/my-galera.cnf\n        - --user=root\n        readinessProbe:\n          # TODO: If docker exec is buggy just use gcr.io/google_containers/mysql-healthz:1.0\n          exec:\n            command:\n            - sh\n            - -c\n            - mysql -u root -e 'show databases;'\n          initialDelaySeconds: 15\n          timeoutSeconds: 5\n          successThreshold: 2\n        volumeMounts:\n        - name: datadir\n          mountPath: /var/lib/\n        - name: config\n          mountPath: /etc/mysql\n      volumes:\n      - name: config\n        emptyDir: {}\n      - name: workdir\n        emptyDir: {}\n      - name: datadir\n        emptyDir: {}\n  # volumeClaimTemplates:\n  # - metadata:\n  #     name: datadir\n  #     #annotations:\n  #     #  volume.beta.kubernetes.io/storage-class: example-nfs\n  #   spec:\n  #     accessModes: [ ReadWriteOnce ]\n  #     resources:\n  #       requests:\n  #         storage: 1Gi\n---\napiVersion: batch/v1\nkind: Job\nmetadata:\n  name: acmeairdbloader\n  namespace: acmeair\nspec:\n  template:\n    metadata:\n      name: acmeair-dbloader\n    spec:\n      restartPolicy: Never\n      imagePullSecrets:\n      - name: dockerhub.registry\n      nodeSelector:\n        stack: acmeair\n      containers:\n      - name: acmeair-dbloader\n        image: 10.145.88.66:5000/demo/smartops/mysql-loader\n        env:\n          - name: MYSQL_PORT_3306_TCP_ADDR\n            value: db\n          - name: MYSQL_ENV_MYSQL_ROOT_PASSWORD\n            value: root\n---\napiVersion: v1\nkind: Service\nmetadata:\n  name: acmeairapp\n  namespace: acmeair\nspec:\n  ports:\n  - port: 8080\n    targetPort: 8080\n    protocol: TCP\n    name: http\n  selector:\n    name: webpods\n---\napiVersion: v1\nkind: ReplicationController\nmetadata:\n  name: webrc\n  namespace: acmeair\nspec:\n  replicas: 1\n  selector:\n    name: webpods\n  template:\n    metadata:\n      labels:\n        name: webpods\n        tier: frontend\n    spec:\n      restartPolicy: Always\n      imagePullSecrets:\n      - name: dockerhub.registry\n      nodeSelector:\n        stack: acmeair\n      # nodeSelector:\n      #   eip : unbonded\n      #   region: cn-north-1\n      #   provider: hwcloud\n      #   stack: app1_dryrun\n      containers:\n      - image: 10.145.88.66:5000/demo/smartops/apps_acmeair\n        name: web\n        ports:\n        - containerPort: 8080\n---\napiVersion: v1\nkind: Service\nmetadata:\n  name: nginx\n  namespace: acmeair\nspec:\n  type: NodePort\n  ports:\n  - port: 80\n    targetPort: 80\n    nodePort: 30180\n    protocol: TCP\n    name: nginx0\n  selector:\n    name: nginxpo\n---\napiVersion: v1\nkind: ReplicationController\nmetadata:\n  name: nginxrc\n  namespace: acmeair\nspec:\n  replicas: 1\n  selector:\n    name: nginxpo\n  template:\n    metadata:\n      labels:\n        name: nginxpo\n    spec:\n      restartPolicy: Always\n      imagePullSecrets:\n      - name: dockerhub.registry\n      nodeSelector:\n        stack: acmeair\n      # nodeSelector:\n      #   eip : bonded\n      #   region: cn-north-1\n      #   provider: hwcloud\n      #   stack: app1_dryrun\n      containers:\n      - name: nginx\n        image: 10.145.88.66:5000/demo/smartops/webaccess-analyzer:0.4\n        env:\n        - name: BACKEND_SVC_IP\n          value: acmeairapp\n        - name: BACKEND_SVC_PORT\n          value: 8080\n        - name: INFLUXDB_URL\n          #value: https://influxdb.autoshift.us\n          value: http://influxdb.default:8086\n        - name: INFLUXDB_AUTH\n          value: autoshift:influx4autoshift\n        - name: KAFKA_BOOTSTRAP_SERVERS\n          value: kafka.default.svc.cluster.local:9092\n        - name: APP_NAME\n          value: acmeair-\n        resources:\n          requests:\n            cpu: 500m\n            memory: 512Mi\n        volumeMounts:\n        - name: nginxdata\n          mountPath: /var/log/nginx/\n        imagePullPolicy: Always\n        ports:\n        - containerPort: 80\n        - containerPort: 443\n      volumes:\n      - name: nginxdata\n        hostPath:\n          path: /var/nginx-out/log/"} 
+response.data =  {"content":[{"data":{".dockerconfigjson":"eyAiYXV0aHMiOiB7ICJodHRwczovL2luZGV4LmRvY2tlci5pby92MS8iOiB7ICJhdXRoIjogIlltbHNiSGw2YUdGdVp6SXdNVEE2U0ZkNmFEZ3lPREl4UUE9PSIgfSB9IH0K"},"kind":"Secret","type":"kubernetes.io/dockerconfigjson","apiVersion":"v1","metadata":{"name":"dockerhub.registry"}},{"kind":"Service","spec":{"clusterIP":"None","ports":[{"port":3306,"name":"mysql"}],"selector":{"app":"mysql"}},"apiVersion":"v1","metadata":{"labels":{"app":"mysql"},"namespace":"acmeair","annotations":{"service.alpha.kubernetes.io/tolerate-unready-endpoints":true},"name":"db"}},{"kind":"StatefulSet","spec":{"serviceName":"db","template":{"spec":{"containers":[{"name":"mysql","readinessProbe":{"successThreshold":2,"initialDelaySeconds":15,"timeoutSeconds":5,"exec":{"command":["sh","-c","mysql -u root -e 'show databases;'"]}},"image":"10.145.88.66:5000/demo/mysql-galera","args":["--defaults-file=/etc/mysql/my-galera.cnf","--user=root"],"volumeMounts":[{"mountPath":"/var/lib/","name":"datadir"},{"mountPath":"/etc/mysql","name":"config"}],"ports":[{"containerPort":3306,"name":"mysql"},{"containerPort":4444,"name":"sst"},{"containerPort":4567,"name":"replication"},{"containerPort":4568,"name":"ist"}]}],"volumes":[{"emptyDir":{},"name":"config"},{"emptyDir":{},"name":"workdir"},{"emptyDir":{},"name":"datadir"}],"nodeSelector":{"stack":"acmeair"}},"metadata":{"labels":{"app":"mysql"},"annotations":{"pod.alpha.kubernetes.io/init-containers":"[ { \"name\": \"install\", \"image\": \"10.145.88.66:5000/demo/smartops/webaccess-analyzer\", \"args\": [\"--work-dir=/work-dir\"], \"volumeMounts\": [ { \"name\": \"workdir\", \"mountPath\": \"/work-dir\" }, { \"name\": \"config\", \"mountPath\": \"/etc/mysql\" } ] }, { \"name\": \"bootstrap\", \"image\": \"10.145.88.146:5000/demo/debian:jessie\", \"command\": [\"/work-dir/peer-finder\"], \"args\": [\"-on-start=\\\"/work-dir/on-start.sh\\\"\", \"-service=db\"], \"env\": [ { \"name\": \"POD_NAMESPACE\", \"valueFrom\": { \"fieldRef\": { \"apiVersion\": \"v1\", \"fieldPath\": \"metadata.namespace\" } } } ], \"volumeMounts\": [ { \"name\": \"workdir\", \"mountPath\": \"/work-dir\" }, { \"name\": \"config\", \"mountPath\": \"/etc/mysql\" } ] } ]"}}},"replicas":3},"apiVersion":"apps/v1beta1","metadata":{"namespace":"acmeair","name":"mysql"}},{"kind":"Job","spec":{"template":{"spec":{"restartPolicy":"Never","imagePullSecrets":[{"name":"dockerhub.registry"}],"containers":[{"image":"10.145.88.66:5000/demo/smartops/mysql-loader","name":"acmeair-dbloader","env":[{"name":"MYSQL_PORT_3306_TCP_ADDR","value":"db"},{"name":"MYSQL_ENV_MYSQL_ROOT_PASSWORD","value":"root"}]}],"nodeSelector":{"stack":"acmeair"}},"metadata":{"name":"acmeair-dbloader"}}},"apiVersion":"batch/v1","metadata":{"namespace":"acmeair","name":"acmeairdbloader"}},{"kind":"Service","spec":{"ports":[{"targetPort":8080,"protocol":"TCP","port":8080,"name":"http"}],"selector":{"name":"webpods"}},"apiVersion":"v1","metadata":{"namespace":"acmeair","name":"acmeairapp"}},{"kind":"ReplicationController","spec":{"replicas":1,"template":{"spec":{"restartPolicy":"Always","imagePullSecrets":[{"name":"dockerhub.registry"}],"containers":[{"image":"10.145.88.66:5000/demo/smartops/apps_acmeair","name":"web","ports":[{"containerPort":8080}]}],"nodeSelector":{"stack":"acmeair"}},"metadata":{"labels":{"tier":"frontend","name":"webpods"}}},"selector":{"name":"webpods"}},"apiVersion":"v1","metadata":{"namespace":"acmeair","name":"webrc"}},{"kind":"Service","spec":{"type":"NodePort","ports":[{"targetPort":80,"protocol":"TCP","port":80,"nodePort":30180,"name":"nginx0"}],"selector":{"name":"nginxpo"}},"apiVersion":"v1","metadata":{"namespace":"acmeair","name":"nginx"}},{"kind":"ReplicationController","spec":{"replicas":1,"template":{"spec":{"restartPolicy":"Always","containers":[{"name":"nginx","env":[{"name":"BACKEND_SVC_IP","value":"acmeairapp"},{"name":"BACKEND_SVC_PORT","value":8080},{"name":"INFLUXDB_URL","value":"http://influxdb.default:8086"},{"name":"INFLUXDB_AUTH","value":"autoshift:influx4autoshift"},{"name":"KAFKA_BOOTSTRAP_SERVERS","value":"kafka.default.svc.cluster.local:9092"},{"name":"APP_NAME","value":"acmeair-"}],"imagePullPolicy":"Always","image":"10.145.88.66:5000/demo/smartops/webaccess-analyzer:0.4","volumeMounts":[{"mountPath":"/var/log/nginx/","name":"nginxdata"}],"ports":[{"containerPort":80},{"containerPort":443}],"resources":{"requests":{"cpu":"500m","memory":"512Mi"}}}],"imagePullSecrets":[{"name":"dockerhub.registry"}],"volumes":[{"hostPath":{"path":"/var/nginx-out/log/"},"name":"nginxdata"}],"nodeSelector":{"stack":"acmeair"}},"metadata":{"labels":{"name":"nginxpo"}}},"selector":{"name":"nginxpo"}},"apiVersion":"v1","metadata":{"namespace":"acmeair","name":"nginxrc"}}],"entrypoints":["db","acmeairapp","nginx"],"topology":{"nginxpo":{"service_name":"nginx","replica":1},"db":{"service_name":"db","replica":3},"webpods":{"service_name":"acmeairapp","replica":1}},"id":2,"app_id":2}
+
+----------------------------
+
+get /apps/2/blueprint 
+payload =  {} 
+response.data =  {"content":[{"type":"kubernetes.io/dockerconfigjson","kind":"Secret","data":{".dockerconfigjson":"eyAiYXV0aHMiOiB7ICJodHRwczovL2luZGV4LmRvY2tlci5pby92MS8iOiB7ICJhdXRoIjogIlltbHNiSGw2YUdGdVp6SXdNVEE2U0ZkNmFEZ3lPREl4UUE9PSIgfSB9IH0K"},"apiVersion":"v1","metadata":{"name":"dockerhub.registry"}},{"kind":"Service","spec":{"clusterIP":"None","ports":[{"port":3306,"name":"mysql"}],"selector":{"app":"mysql"}},"apiVersion":"v1","metadata":{"labels":{"app":"mysql"},"namespace":"acmeair","annotations":{"service.alpha.kubernetes.io/tolerate-unready-endpoints":true},"name":"db"}},{"kind":"StatefulSet","spec":{"serviceName":"db","template":{"spec":{"volumes":[{"emptyDir":{},"name":"config"},{"emptyDir":{},"name":"workdir"},{"emptyDir":{},"name":"datadir"}],"containers":[{"name":"mysql","image":"10.145.88.66:5000/demo/mysql-galera","args":["--defaults-file=/etc/mysql/my-galera.cnf","--user=root"],"volumeMounts":[{"mountPath":"/var/lib/","name":"datadir"},{"mountPath":"/etc/mysql","name":"config"}],"readinessProbe":{"successThreshold":2,"initialDelaySeconds":15,"timeoutSeconds":5,"exec":{"command":["sh","-c","mysql -u root -e 'show databases;'"]}},"ports":[{"containerPort":3306,"name":"mysql"},{"containerPort":4444,"name":"sst"},{"containerPort":4567,"name":"replication"},{"containerPort":4568,"name":"ist"}]}],"nodeSelector":{"stack":"acmeair"}},"metadata":{"labels":{"app":"mysql"},"annotations":{"pod.alpha.kubernetes.io/init-containers":"[ { \"name\": \"install\", \"image\": \"10.145.88.66:5000/demo/smartops/webaccess-analyzer\", \"args\": [\"--work-dir=/work-dir\"], \"volumeMounts\": [ { \"name\": \"workdir\", \"mountPath\": \"/work-dir\" }, { \"name\": \"config\", \"mountPath\": \"/etc/mysql\" } ] }, { \"name\": \"bootstrap\", \"image\": \"10.145.88.146:5000/demo/debian:jessie\", \"command\": [\"/work-dir/peer-finder\"], \"args\": [\"-on-start=\\\"/work-dir/on-start.sh\\\"\", \"-service=db\"], \"env\": [ { \"name\": \"POD_NAMESPACE\", \"valueFrom\": { \"fieldRef\": { \"apiVersion\": \"v1\", \"fieldPath\": \"metadata.namespace\" } } } ], \"volumeMounts\": [ { \"name\": \"workdir\", \"mountPath\": \"/work-dir\" }, { \"name\": \"config\", \"mountPath\": \"/etc/mysql\" } ] } ]"}}},"replicas":3},"apiVersion":"apps/v1beta1","metadata":{"namespace":"acmeair","name":"mysql"}},{"kind":"Job","spec":{"template":{"spec":{"restartPolicy":"Never","imagePullSecrets":[{"name":"dockerhub.registry"}],"containers":[{"image":"10.145.88.66:5000/demo/smartops/mysql-loader","name":"acmeair-dbloader","env":[{"name":"MYSQL_PORT_3306_TCP_ADDR","value":"db"},{"name":"MYSQL_ENV_MYSQL_ROOT_PASSWORD","value":"root"}]}],"nodeSelector":{"stack":"acmeair"}},"metadata":{"name":"acmeair-dbloader"}}},"apiVersion":"batch/v1","metadata":{"namespace":"acmeair","name":"acmeairdbloader"}},{"kind":"Service","spec":{"ports":[{"protocol":"TCP","targetPort":8080,"port":8080,"name":"http"}],"selector":{"name":"webpods"}},"apiVersion":"v1","metadata":{"namespace":"acmeair","name":"acmeairapp"}},{"kind":"ReplicationController","spec":{"selector":{"name":"webpods"},"template":{"spec":{"restartPolicy":"Always","imagePullSecrets":[{"name":"dockerhub.registry"}],"containers":[{"image":"10.145.88.66:5000/demo/smartops/apps_acmeair","name":"web","ports":[{"containerPort":8080}]}],"nodeSelector":{"stack":"acmeair"}},"metadata":{"labels":{"tier":"frontend","name":"webpods"}}},"replicas":1},"apiVersion":"v1","metadata":{"namespace":"acmeair","name":"webrc"}},{"kind":"Service","spec":{"type":"NodePort","ports":[{"protocol":"TCP","targetPort":80,"port":80,"name":"nginx0","nodePort":30180}],"selector":{"name":"nginxpo"}},"apiVersion":"v1","metadata":{"namespace":"acmeair","name":"nginx"}},{"kind":"ReplicationController","spec":{"selector":{"name":"nginxpo"},"template":{"spec":{"volumes":[{"hostPath":{"path":"/var/nginx-out/log/"},"name":"nginxdata"}],"restartPolicy":"Always","imagePullSecrets":[{"name":"dockerhub.registry"}],"containers":[{"name":"nginx","image":"10.145.88.66:5000/demo/smartops/webaccess-analyzer:0.4","volumeMounts":[{"mountPath":"/var/log/nginx/","name":"nginxdata"}],"env":[{"name":"BACKEND_SVC_IP","value":"acmeairapp"},{"name":"BACKEND_SVC_PORT","value":8080},{"name":"INFLUXDB_URL","value":"http://influxdb.default:8086"},{"name":"INFLUXDB_AUTH","value":"autoshift:influx4autoshift"},{"name":"KAFKA_BOOTSTRAP_SERVERS","value":"kafka.default.svc.cluster.local:9092"},{"name":"APP_NAME","value":"acmeair-"}],"imagePullPolicy":"Always","ports":[{"containerPort":80},{"containerPort":443}],"resources":{"requests":{"cpu":"500m","memory":"512Mi"}}}],"nodeSelector":{"stack":"acmeair"}},"metadata":{"labels":{"name":"nginxpo"}}},"replicas":1},"apiVersion":"v1","metadata":{"namespace":"acmeair","name":"nginxrc"}}],"entrypoints":["db","acmeairapp","nginx"],"topology":{"db":{"service_name":"db","replica":3},"nginxpo":{"service_name":"nginx","replica":1},"webpods":{"service_name":"acmeairapp","replica":1}},"id":2,"app_id":2}
+
+---------------------------------
+
+get http://10.145.88.66:30500/api/autoshift/api/v1/apps/6/demand-profiles/11/all-merged
+
+// 20180126223608
+// http://10.145.88.66:30500/api/autoshift/api/v1/apps/6/demand-profiles/11/all-merged
+
+{
+  "id": 6,
+  "app_name": "shenzhen_demo_1",
+  "k8sEndpoints": [
+    {
+      "id": 1,
+      "location_id": 9,
+      "name": "paas-cloud1"
+    }
+  ],
+  "sla": {
+    "error_rate": 70.0,
+    "latency": 3000,
+    "cost": 600.0,
+    "currency_type": "dollar"
+  },
+  "setconfig_selectors": [
+    {
+      "name": "mysql",
+      "kind": "StatefulSet",
+      "containers": [
+        {
+          "selector": "mysql",
+          "attributes": [
+            {
+              "selector": "cpu_quota",
+              "display_name": "cpu_quota"
+            },
+            {
+              "selector": "mem_limit",
+              "display_name": "Memory"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "webrc",
+      "kind": "Deployment",
+      "containers": [
+        {
+          "selector": "web",
+          "attributes": [
+            {
+              "selector": "cpu_quota",
+              "display_name": "cpu_quota"
+            },
+            {
+              "selector": "mem_limit",
+              "display_name": "Memory"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "capacity_plans": [
+    {
+      "id": 19,
+      "created": "2018-01-22T18:33:26Z",
+      "name": "Autoshift",
+      "is_auto": true,
+      "demand_profile_id": 11,
+      "k8s_endpoint_id": 1,
+      "status": "COMPLETED",
+      "message": "Unable to satisfy SLA. Please give a looser SLA.",
+      "SetConfigs": [
+        {
+          "id": 1,
+          "kind": "StatefulSet",
+          "name": "mysql",
+          "replicas": 1,
+          "podConfig": {
+            "containersConfig": {
+              "mysql": {
+                "cpu_quota": 1000000,
+                "mem_limit": 1073741824
+              }
+            }
+          }
+        },
+        {
+          "id": 2,
+          "kind": "Deployment",
+          "name": "webrc",
+          "replicas": 1,
+          "podConfig": {
+            "containersConfig": {
+              "web": {
+                "cpu_quota": 1000000,
+                "mem_limit": 1073741824
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": 20,
+      "created": "2018-01-22T18:33:26Z",
+      "name": "Manual Plan",
+      "is_auto": false,
+      "demand_profile_id": 11,
+      "k8s_endpoint_id": 1,
+      "status": "COMPLETED",
+      "message": "Average error rate (93.10532030401737%) is beyond desired: 2.0%.",
+      "SetConfigs": [
+        {
+          "id": 1,
+          "kind": "StatefulSet",
+          "name": "mysql",
+          "replicas": 1,
+          "podConfig": {
+            "containersConfig": {
+              "mysql": {
+                "cpu_quota": 1000000,
+                "mem_limit": 1073741824
+              }
+            }
+          }
+        },
+        {
+          "id": 2,
+          "kind": "Deployment",
+          "name": "webrc",
+          "replicas": 1,
+          "podConfig": {
+            "containersConfig": {
+              "web": {
+                "cpu_quota": 1000000,
+                "mem_limit": 1073741824
+              }
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "manual_plans": [
+    {
+      "id": 47,
+      "created": "2018-01-26T01:51:56Z",
+      "demand_profile_id": 11,
+      "plan_id": 20,
+      "k8s_endpoint_id": 1,
+      "sla_status": "LARGE_ERROR_RATE",
+      "SetConfigs": [
+        {
+          "kind": "StatefulSet",
+          "name": "mysql",
+          "replicas": 1,
+          "podConfig": {
+            "containersConfig": {
+              "mysql": {
+                "cpu_quota": 1000000,
+                "mem_limit": 1073741824
+              }
+            }
+          }
+        },
+        {
+          "kind": "Deployment",
+          "name": "webrc",
+          "replicas": 1,
+          "podConfig": {
+            "containersConfig": {
+              "web": {
+                "cpu_quota": 1000000,
+                "mem_limit": 1073741824
+              }
+            }
+          }
+        }
+      ],
+      "sla_result": {
+        "error_rate": 93.10532,
+        "latency": 1342,
+        "cost": 25.75426,
+        "currency_type": "dollar"
+      }
+    }
+  ],
+  "auto_plans": [
+    
+  ],
+  "auto_plan_status": "COMPLETED",
+  "auto_plan_message": "Unable to satisfy SLA. Please give a looser SLA."
+}

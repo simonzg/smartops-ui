@@ -18,8 +18,8 @@ class GuideBar extends Component {
     render() {
         let titles = [
             "Operational Requirements",
-            "Application Blue Print",
-            "Application Topology",
+            "Blue Print",
+            "Topology",
             "Test Plan",
             "Dry Run Plan",
             "Dry Run Results"
