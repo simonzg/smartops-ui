@@ -1,9 +1,7 @@
 import React, { Component } from "react";
-import Navbar from "../components/Navbar";
 import { push } from "react-router-redux";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
-import { Alert, Button } from "reactstrap";
 import { clear_notification } from "../modules/client";
 import NotificationAlert from "./NotificationAlert";
 

@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import { Link } from "react-router-dom";
 import { push } from "react-router-redux";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
@@ -29,7 +28,7 @@ class GuideBar extends Component {
             let className = "";
             if (this.props.step > index + 1) {
                 className = "active";
-            } else if (this.props.step == index + 1) {
+            } else if (this.props.step === index + 1) {
                 className = "current";
             }
             lis.push(

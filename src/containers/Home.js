@@ -1,9 +1,7 @@
 import React, { Component } from "react";
 import Navbar from "../components/Navbar";
-import { push } from "react-router-redux";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
-import { Button } from "reactstrap";
 
 // modules
 import { list_apps } from "../modules/client";

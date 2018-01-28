@@ -8,6 +8,11 @@ let apps = [
     created_at: "2017-12-16 11:43:06",
     id: 1,
     name: "app1",
+
+    services: 1,
+    pods: 1,
+    containers: 2,
+
     status: { status: "CREATING_STEP_0", message: "" }
   }
 ];

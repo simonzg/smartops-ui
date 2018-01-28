@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
 
-class DryRun extends Component {
+class DryRunPlan extends Component {
   render() {
     return (
       <div className="container body-container">
@@ -120,4 +120,4 @@ class DryRun extends Component {
   }
 }
 
-export default DryRun;
+export default DryRunPlan;

@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import { Link } from "react-router-dom";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 import { push } from "react-router-redux";
@@ -48,7 +47,7 @@ class AppCoverCreate extends Component {
 
     componentWillReceiveProps(nextProps) {
         console.log("recv:", nextProps);
-        if (nextProps.status && nextProps.status == "success") {
+        if (nextProps.status && nextProps.status === "success") {
             this.props.push(`/${nextProps.data.id}/step/1`);
         }
     }

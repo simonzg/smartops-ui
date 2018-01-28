@@ -14,9 +14,21 @@ class AppCover extends Component {
                             {this.props.name}
                         </Link>
                         <div className="row clearfix">
-                            <div className="col-md-4">Service</div>
-                            <div className="col-md-4">Container</div>
-                            <div className="col-md-4">Pod</div>
+                            {this.props.services && (
+                                <div className="col-md-4">
+                                    Service: {this.props.services}
+                                </div>
+                            )}
+                            {this.props.containers && (
+                                <div className="col-md-4">
+                                    Container: {this.props.containers}
+                                </div>
+                            )}
+                            {this.props.pods && (
+                                <div className="col-md-4">
+                                    Pod: {this.props.pods}
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>

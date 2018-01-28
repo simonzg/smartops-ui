@@ -1,7 +1,7 @@
 import axios from "axios";
-import { push } from "react-router-redux";
 
-const BASE = "http://10.145.88.67:8000";
+// const BASE = "http://10.145.88.67:8000";
+const BASE = "http://localhost:8000";
 
 export const LIST_APPS = "client/LIST_APPS";
 export const LIST_APPS_SUCCESS = "client/LIST_APPS_SUCCESS";
@@ -27,6 +27,14 @@ export const LOAD_BLUEPRINT_JSON = "client/LOAD_BLUEPRINT_JSON";
 export const LOAD_BLUEPRINT_JSON_SUCCESS = "client/LOAD_BLUEPRINT_JSON_SUCCESS";
 export const LOAD_BLUEPRINT_JSON_FAILURE = "client/LOAD_BLUEPRINT_JSON_FAILURE";
 
+export const LOAD_DRYRUN_PLAN = "client/LOAD_DRYRUN_PLAN";
+export const LOAD_DRYRUN_PLAN_SUCCESS = "client/LOAD_DRYRUN_PLAN_SUCCESS";
+export const LOAD_DRYRUN_PLAN_FAILURE = "client/LOAD_DRYRUN_PLAN_FAILURE";
+
+export const LOAD_DRYRUN_RESULT = "client/LOAD_DRYRUN_RESULT";
+export const LOAD_DRYRUN_RESULT_SUCCESS = "client/LOAD_DRYRUN_RESULT_SUCCESS";
+export const LOAD_DRYRUN_RESULT_FAILURE = "client/LOAD_DRYRUN_RESULT_FAILURE";
+
 export const NOTIFICATION = "client/NOTIFICATION";
 export const CLEAR_NOTIFICATION = "client/CLEAR_NOTIFICATION";
 
@@ -35,7 +43,9 @@ const events = [
   CREATE_APP,
   LOAD_BLUEPRINT,
   SAVE_BLUEPRINT,
-  LOAD_BLUEPRINT_JSON
+  LOAD_BLUEPRINT_JSON,
+  LOAD_DRYRUN_PLAN,
+  LOAD_DRYRUN_RESULT
 ];
 
 const list_appsState = {
@@ -137,7 +147,7 @@ const callAPI = (dispatch, base_type, verb, url, payload = {}) => {
     url: BASE + url
   };
 
-  if (verb != "get") {
+  if (verb !== "get") {
     config.data = payload;
   }
 
@@ -190,6 +200,7 @@ const callAPI = (dispatch, base_type, verb, url, payload = {}) => {
   }
 };
 
+// apps
 export const list_apps = () => {
   return dispatch => {
     callAPI(dispatch, LIST_APPS, "get", "/apps");
@@ -209,6 +220,7 @@ export const save_requirement = (app_id, payload) => {
   };
 };
 
+// blueprint
 export const load_blueprint = app_id => {
   console.log("loading blueprint");
   let url = `/apps/${app_id}/raw_blueprint`;
@@ -231,6 +243,23 @@ export const load_blueprint_json = app_id => {
   };
 };
 
+// dryrun
+
+export const load_dryrun_plan = app_id => {
+  let url = `/apps/${app_id}/dryrun_plan`;
+  return dispatch => {
+    callAPI(dispatch, LOAD_DRYRUN_PLAN, "get", url);
+  };
+};
+
+export const load_dryrun_result = app_id => {
+  let url = `/apps/${app_id}/dryrun_result`;
+  return dispatch => {
+    callAPI(dispatch, LOAD_DRYRUN_RESULT, "get", url);
+  };
+};
+
+// notification
 export const show_notification = err => {
   return dispatch => {
     dispatch({ type: NOTIFICATION, error: err });

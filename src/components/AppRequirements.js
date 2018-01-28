@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import { Link } from "react-router-dom";
 import { Button } from "reactstrap";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
@@ -34,7 +33,7 @@ class AppRequirements extends Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        if (nextProps.status && nextProps.status == "success") {
+        if (nextProps.status && nextProps.status === "success") {
             this.props.push(
                 `/${this.props.app_id}/step/${this.props.step + 1}`
             );

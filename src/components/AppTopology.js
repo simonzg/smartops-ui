@@ -1,13 +1,7 @@
 import React, { Component } from "react";
-import {
-    Dropdown,
-    DropdownToggle,
-    DropdownMenu,
-    DropdownItem
-} from "reactstrap";
+import { FormGroup, Input, Label } from "reactstrap";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
-import { Button } from "reactstrap";
 import { load_blueprint_json } from "../modules/client";
 import TopologyGroup from "../components/TopologyGroup";
 
@@ -17,16 +11,14 @@ class AppTopology extends Component {
     constructor(props) {
         super(props);
 
-        this.toggle = this.toggle.bind(this);
+        this.handleChange = this.handleChange.bind(this);
         this.state = {
-            dropdownOpen: false
+            entrypoint: ""
         };
     }
 
-    toggle() {
-        this.setState({
-            dropdownOpen: !this.state.dropdownOpen
-        });
+    handleChange(event) {
+        this.setState({ [event.target.name]: event.target.value });
     }
 
     componentWillMount() {
@@ -34,7 +26,7 @@ class AppTopology extends Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        if (nextProps.status && nextProps.status == "success") {
+        if (nextProps.status && nextProps.status === "success") {
             this.props.push(
                 `/${this.props.app_id}/step/${this.props.step + 1}`
             );
@@ -42,8 +34,6 @@ class AppTopology extends Component {
     }
 
     render() {
-        console.log(this.props.data);
-
         let topologies = <div />;
         if (this.props.topology && Object.keys(this.props.topology)) {
             let pod_names = Object.keys(this.props.topology);
@@ -52,13 +42,13 @@ class AppTopology extends Component {
             ));
         }
 
-        let entrypoints = <DropdownItem />;
-        if (
-            this.props.hasOwnProperty("entrypoints") &&
-            this.props.entrypoints
-        ) {
+        let entrypoints = <div />;
+        if (this.props.entrypoints) {
+            if (this.state.entrypoint !== this.props.entrypoints[0]) {
+                this.setState({ entrypoint: this.props.entrypoints[0] });
+            }
             entrypoints = this.props.entrypoints.map(ep => (
-                <DropdownItem>{ep}</DropdownItem>
+                <option value={ep}>{ep}</option>
             ));
         }
 
@@ -67,26 +57,20 @@ class AppTopology extends Component {
         return (
             <div className="container body-container">
                 <div className="page-title"> Application Topology</div>
-                <Dropdown isOpen={this.state.dropdownOpen} toggle={this.toggle}>
-                    <span
-                        onClick={this.toggle}
-                        data-toggle="dropdown"
-                        aria-haspopup="true"
-                        aria-expanded={this.state.dropdownOpen}
-                    >
-                        {this.state.value}
-                    </span>
-                    <Dropdown
-                        isOpen={this.state.dropdownOpen}
-                        toggle={this.toggle}
-                    >
-                        <DropdownToggle caret>
-                            Select Entry Point
-                        </DropdownToggle>
-                        <DropdownMenu>{entrypoints}</DropdownMenu>
-                    </Dropdown>
-                </Dropdown>
-
+                <div className="row">
+                    <div className="col-3">
+                        <FormGroup>
+                            <Label>Entrypoints</Label>
+                            <Input
+                                type="select"
+                                name="method"
+                                onChange={this.handleChange}
+                            >
+                                {entrypoints}
+                            </Input>
+                        </FormGroup>
+                    </div>
+                </div>
                 <div className="topology">{topologies}</div>
                 <div className="action-footer">
                     <Link className="btn btn-main" to={next_url}>

@@ -1,14 +1,11 @@
 import React, { Component } from "react";
 
-import { render } from "react-dom";
-import brace from "brace";
 import AceEditor from "react-ace";
 import "brace/mode/yaml";
 import "brace/theme/monokai";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 import { Button } from "reactstrap";
-import { Link } from "react-router-dom";
 
 import { load_blueprint, save_blueprint } from "../modules/client";
 import { push } from "react-router-redux";
@@ -32,7 +29,7 @@ class AppBlueprint extends Component {
             this.setState({ yml: nextProps.yml });
         }
 
-        if (nextProps.status && nextProps.status == "success") {
+        if (nextProps.status && nextProps.status === "success") {
             this.props.push(
                 `/${this.props.app_id}/step/${this.props.step + 1}`
             );

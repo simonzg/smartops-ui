@@ -1,39 +1,49 @@
 import React, { Component } from "react";
-import { Link } from "react-router-dom";
-import { FormGroup, Input, Label } from "reactstrap";
-
-import brace from "brace";
-import AceEditor from "react-ace";
-import "brace/mode/yaml";
-import "brace/theme/monokai";
+import { FormGroup, Input, Label, Button } from "reactstrap";
+import { bindActionCreators } from "redux";
+import { connect } from "react-redux";
+import { show_notification } from "../modules/client";
+import { push } from "react-router-redux";
 
 class AppTestPlan extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            method: "",
-            header: "",
-            name: "",
+            method: "GET",
+            content_type: "application/json",
             url: "",
-            load: 0,
-            body: ""
+            request_per_second: 0
         };
 
         this.handleChange = this.handleChange.bind(this);
-        this.onChange = this.onChange.bind(this);
-    }
-
-    onChange(newValue) {
-        this.setState({ body: newValue });
+        this.validateForm = this.validateForm.bind(this);
+        this.handleSubmit = this.handleSubmit.bind(this);
     }
 
     handleChange(event) {
         this.setState({ [event.target.name]: event.target.value });
     }
 
-    render() {
-        let next_url = `/${this.props.app_id}/step/5`;
+    validateForm() {
+        return (
+            this.state.method &&
+            this.state.content_type &&
+            this.state.url &&
+            this.state.request_per_second
+        );
+    }
 
+    handleSubmit() {
+        if (this.validateForm()) {
+            let next_url = `/${this.props.app_id}/step/5`;
+            this.props.push(next_url);
+        } else {
+            this.props.show_notification("No input could be empty here");
+        }
+    }
+
+    render() {
+        console.log(this.state);
         return (
             <div className="container body-container">
                 <h1 className="page-title">Test Plan</h1>
@@ -56,7 +66,7 @@ class AppTestPlan extends Component {
                             <Label>Content Type</Label>
                             <Input
                                 type="select"
-                                name="header"
+                                name="content_type"
                                 onChange={this.handleChange}
                             >
                                 <option>application/json</option>
@@ -79,7 +89,7 @@ class AppTestPlan extends Component {
                             <Label>Request load per second</Label>
                             <Input
                                 type="number"
-                                name="load"
+                                name="request_per_second"
                                 onChange={this.handleChange}
                             />
                         </FormGroup>
@@ -87,13 +97,21 @@ class AppTestPlan extends Component {
                 </div>
 
                 <div className="action-footer">
-                    <Link className="btn btn-main" to={next_url}>
+                    <Button
+                        className="btn btn-main"
+                        onClick={this.handleSubmit}
+                    >
                         Next
-                    </Link>
+                    </Button>
                 </div>
             </div>
         );
     }
 }
 
-export default AppTestPlan;
+const mapStateToProps = state => ({});
+
+const mapDispatchToProps = dispatch =>
+    bindActionCreators({ push, show_notification }, dispatch);
+
+export default connect(mapStateToProps, mapDispatchToProps)(AppTestPlan);

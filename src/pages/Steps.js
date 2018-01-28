@@ -5,8 +5,8 @@ import AppRequirements from "../components/AppRequirements";
 import AppBlueprint from "../components/AppBlueprint";
 import AppTopology from "../components/AppTopology";
 import AppTestPlan from "../components/AppTestPlan";
-import DryRun from "../components/DryRun";
-import DryrunResult from "../components/DryrunResult";
+import DryRunPlan from "../components/DryRunPlan";
+import DryRunResult from "../components/DryRunResult";
 
 class Steps extends Component {
   constructor(props) {
@@ -32,9 +32,9 @@ class Steps extends Component {
       case 4:
         return <AppTestPlan app_id={app_id} step={step} />;
       case 5:
-        return <DryRun app_id={app_id} step={step} />;
+        return <DryRunPlan app_id={app_id} step={step} />;
       case 6:
-        return <DryrunResult app_id={app_id} step={step} />;
+        return <DryRunResult app_id={app_id} step={step} />;
       default:
         return <AppRequirements app_id={app_id} step={1} />;
     }

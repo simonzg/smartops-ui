@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { Button } from "reactstrap";
 
-class DryrunResult extends Component {
+class DryRunResult extends Component {
   render() {
     return (
       <div className="container body-container">
@@ -56,7 +56,6 @@ class DryrunResult extends Component {
                   <div className="progress">
                     <div
                       className="progress-bar bg-success"
-                      role="guide-bar"
                       style={{ width: 75 }}
                       aria-valuenow="75"
                       aria-valuemin="0"
@@ -69,7 +68,6 @@ class DryrunResult extends Component {
                   <div className="progress">
                     <div
                       className="progress-bar bg-warning"
-                      role="guide-bar"
                       style={{ width: 25 }}
                       aria-valuenow="25"
                       aria-valuemin="0"
@@ -86,4 +84,4 @@ class DryrunResult extends Component {
   }
 }
 
-export default DryrunResult;
+export default DryRunResult;
