@@ -38,7 +38,10 @@ class Step4_TestPlan extends Component {
             let next_url = `/${this.props.app_id}/step/5`;
             this.props.push(next_url);
         } else {
-            this.props.show_notification("No input could be empty here");
+            this.props.show_notification(
+                "danger",
+                "No input could be empty here"
+            );
         }
     }
 

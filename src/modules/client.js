@@ -129,9 +129,12 @@ export default (state = list_appsState, action) => {
   // notification
   switch (action.type) {
     case NOTIFICATION:
-      return { ...state, error: action.error };
+      return {
+        ...state,
+        notification: { color: action.color, message: action.message }
+      };
     case CLEAR_NOTIFICATION:
-      return { ...state, error: "" };
+      return { ...state, notification: null };
   }
 
   return state;
@@ -179,7 +182,11 @@ const callAPI = (dispatch, base_type, verb, url, payload = {}) => {
           JSON.stringify(error)
         );
         dispatch({ type: base_type + "_FAILURE", error: error.message });
-        dispatch({ type: NOTIFICATION, error: error.message });
+        dispatch({
+          type: NOTIFICATION,
+          color: "danger",
+          message: error.message
+        });
       });
   } catch (error) {
     let message = "";
@@ -260,9 +267,9 @@ export const load_dryrun_result = app_id => {
 };
 
 // notification
-export const show_notification = err => {
+export const show_notification = (color, message) => {
   return dispatch => {
-    dispatch({ type: NOTIFICATION, error: err });
+    dispatch({ type: NOTIFICATION, color, message });
   };
 };
 

@@ -7,14 +7,17 @@ import NotificationAlert from "./NotificationAlert";
 
 class Notification extends Component {
   render() {
-    if (this.props.error) {
+    if (this.props.notification) {
       setTimeout(() => {
         this.props.clear_notification();
       }, 3000);
       return (
         <div className="notification show">
           <div className="container">
-            <NotificationAlert color="danger" message={this.props.error} />
+            <NotificationAlert
+              color={this.props.notification.color}
+              message={this.props.notification.message}
+            />
           </div>
         </div>
       );
@@ -25,7 +28,7 @@ class Notification extends Component {
 }
 
 const mapStateToProps = state => ({
-  error: state.client.error
+  notification: state.client.notification
 });
 
 const mapDispatchToProps = dispatch =>

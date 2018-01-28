@@ -27,6 +27,7 @@ class Step1_Requirements extends Component {
             this.props.save_requirement(this.props.app_id, { sla: this.state });
         } else {
             this.props.show_notification(
+                "danger",
                 "Latency and Error Rate must be bigger than 0"
             );
         }
