@@ -2,10 +2,10 @@ import React, { Component } from "react";
 import { Button } from "reactstrap";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
-import { save_requirement, show_notification } from "../modules/client";
+import { save_requirement, show_notification } from "../../modules/client";
 import { push } from "react-router-redux";
 
-class AppRequirements extends Component {
+class Step1_Requirements extends Component {
     constructor(props) {
         super(props);
         this.state = { latency: 0, error_rate: 0 };
@@ -92,4 +92,4 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch =>
     bindActionCreators({ save_requirement, push, show_notification }, dispatch);
 
-export default connect(mapStateToProps, mapDispatchToProps)(AppRequirements);
+export default connect(mapStateToProps, mapDispatchToProps)(Step1_Requirements);

@@ -1,12 +1,12 @@
 import React, { Component } from "react";
-import Navbar from "../components/Navbar";
-import GuideBar from "../components/GuideBar";
-import AppRequirements from "../components/AppRequirements";
-import AppBlueprint from "../components/AppBlueprint";
-import AppTopology from "../components/AppTopology";
-import AppTestPlan from "../components/AppTestPlan";
-import DryRunPlan from "../components/DryRunPlan";
-import DryRunResult from "../components/DryRunResult";
+import Navbar from "../Navbar";
+import GuideBar from "../GuideBar";
+import Step1_Requirements from "./Step1_Requirements";
+import Step2_Blueprint from "./Step2_Blueprint";
+import Step3_Topology from "./Step3_Topology";
+import Step4_TestPlan from "./Step4_TestPlan";
+import Step5_DryRunPlan from "./Step5_DryRunPlan";
+import Step6_DryRunResult from "./Step6_DryRunResult";
 
 class Steps extends Component {
   constructor(props) {
@@ -26,17 +26,17 @@ class Steps extends Component {
   getMainComponent(app_id, step) {
     switch (step) {
       case 2:
-        return <AppBlueprint app_id={app_id} step={step} />;
+        return <Step2_Blueprint app_id={app_id} step={step} />;
       case 3:
-        return <AppTopology app_id={app_id} step={step} />;
+        return <Step3_Topology app_id={app_id} step={step} />;
       case 4:
-        return <AppTestPlan app_id={app_id} step={step} />;
+        return <Step4_TestPlan app_id={app_id} step={step} />;
       case 5:
-        return <DryRunPlan app_id={app_id} step={step} />;
+        return <Step5_DryRunPlan app_id={app_id} step={step} />;
       case 6:
-        return <DryRunResult app_id={app_id} step={step} />;
+        return <Step6_DryRunResult app_id={app_id} step={step} />;
       default:
-        return <AppRequirements app_id={app_id} step={1} />;
+        return <Step1_Requirements app_id={app_id} step={1} />;
     }
   }
 

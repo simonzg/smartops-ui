@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { Button } from "reactstrap";
 
-class DryRunResult extends Component {
+class Step6_DryRunResult extends Component {
   render() {
     return (
       <div className="container body-container">
@@ -84,4 +84,4 @@ class DryRunResult extends Component {
   }
 }
 
-export default DryRunResult;
+export default Step6_DryRunResult;

@@ -2,12 +2,12 @@ import React, { Component } from "react";
 import { FormGroup, Input, Label } from "reactstrap";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
-import { load_blueprint_json } from "../modules/client";
-import TopologyGroup from "../components/TopologyGroup";
+import { load_blueprint_json } from "../../modules/client";
+import TopologyGroup from "./TopologyGroup";
 
 import { Link } from "react-router-dom";
 
-class AppTopology extends Component {
+class Step3_Topology extends Component {
     constructor(props) {
         super(props);
 
@@ -91,4 +91,4 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch =>
     bindActionCreators({ load_blueprint_json }, dispatch);
 
-export default connect(mapStateToProps, mapDispatchToProps)(AppTopology);
+export default connect(mapStateToProps, mapDispatchToProps)(Step3_Topology);

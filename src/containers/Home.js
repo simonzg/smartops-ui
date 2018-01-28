@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import Navbar from "../components/Navbar";
+import Navbar from "../containers/Navbar";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 
@@ -7,8 +7,8 @@ import { connect } from "react-redux";
 import { list_apps } from "../modules/client";
 
 // components
-import AppCoverCreate from "../components/AppCoverCreate";
-import AppCover from "../components/AppCover";
+import AppCoverCreate from "../containers/AppCoverCreate";
+import AppCover from "../containers/AppCover";
 
 class Home extends Component {
   componentWillMount() {

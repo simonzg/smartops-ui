@@ -2,10 +2,10 @@ import React, { Component } from "react";
 import { FormGroup, Input, Label, Button } from "reactstrap";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
-import { show_notification } from "../modules/client";
+import { show_notification } from "../../modules/client";
 import { push } from "react-router-redux";
 
-class AppTestPlan extends Component {
+class Step4_TestPlan extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -114,4 +114,4 @@ const mapStateToProps = state => ({});
 const mapDispatchToProps = dispatch =>
     bindActionCreators({ push, show_notification }, dispatch);
 
-export default connect(mapStateToProps, mapDispatchToProps)(AppTestPlan);
+export default connect(mapStateToProps, mapDispatchToProps)(Step4_TestPlan);

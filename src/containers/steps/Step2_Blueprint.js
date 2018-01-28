@@ -7,10 +7,10 @@ import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 import { Button } from "reactstrap";
 
-import { load_blueprint, save_blueprint } from "../modules/client";
+import { load_blueprint, save_blueprint } from "../../modules/client";
 import { push } from "react-router-redux";
 
-class AppBlueprint extends Component {
+class Step2_Blueprint extends Component {
     constructor(props) {
         super(props);
         this.state = { yml: "" };
@@ -85,4 +85,4 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch =>
     bindActionCreators({ load_blueprint, save_blueprint, push }, dispatch);
 
-export default connect(mapStateToProps, mapDispatchToProps)(AppBlueprint);
+export default connect(mapStateToProps, mapDispatchToProps)(Step2_Blueprint);

@@ -9,7 +9,7 @@ import { ConnectedRouter } from "react-router-redux";
 import store, { history } from "./store";
 
 import Home from "./containers/Home";
-import Steps from "./pages/Steps";
+import Steps from "./containers/steps/Steps";
 import Counter from "./containers/Counter";
 import Notification from "./containers/Notification";
 
