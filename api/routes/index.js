@@ -93,8 +93,31 @@ router.put("/apps/:app_id", (req, res, next) => {
 });
 
 // get dry run plan
-router.get("/apps/<int:app_id>/dryrun_plan", (req, res, next) => {
-  //?
+router.get("/apps/<int:app_id>/dryrun_base_plan", (req, res, next) => {
+  res.json([
+    {
+      name: "mysql",
+      containers: [
+        {
+          memory: 1024.0,
+          name: "mysql",
+          cpu: 1.0
+        }
+      ],
+      pod_replicas: 1
+    },
+    {
+      name: "web",
+      containers: [
+        {
+          memory: 1024.0,
+          name: "web",
+          cpu: 1.0
+        }
+      ],
+      pod_replicas: 1
+    }
+  ]);
 });
 
 // trigger dry run plan

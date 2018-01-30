@@ -1,12 +1,17 @@
 import React, { Component } from "react";
-import { Button } from "reactstrap";
+import { bindActionCreators } from "redux";
+import { connect } from "react-redux";
+import { get_result } from "../../modules/client";
 
 class Step6_DryRunResult extends Component {
+  componentWillMount() {
+    this.props.get_result(this.props.app_id);
+  }
+
   render() {
     return (
       <div className="container body-container">
         <h1 className="page-title">Dry Run Result</h1>
-        <Button Color="link">Download</Button>
         <div className="col-10 result-table" style={{ "padding-left": 0 }}>
           <ul className="result-table-head">
             <li>
@@ -84,4 +89,9 @@ class Step6_DryRunResult extends Component {
   }
 }
 
-export default Step6_DryRunResult;
+const mapStateToProps = state => {};
+
+const mapDispatchToProps = dispatch =>
+  bindActionCreators({ get_result }, dispatch);
+
+export default connect(mapStateToProps, mapDispatchToProps)(Step6_DryRunResult);

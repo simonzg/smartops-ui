@@ -1,7 +1,10 @@
 import axios from "axios";
 
 // const BASE = "http://10.145.88.67:8000";
-const BASE = "http://localhost:8000";
+const BASE = "http://10.145.88.68:8000";
+
+const GET_RESULT_URL =
+  "http://10.145.88.66:30500/api/autoshift/api/v1/apps/6/demand-profiles/11/all-merged";
 
 export const LIST_APPS = "client/LIST_APPS";
 export const LIST_APPS_SUCCESS = "client/LIST_APPS_SUCCESS";
@@ -10,6 +13,10 @@ export const LIST_APPS_FAILURE = "client/LIST_APPS_FAILURE";
 export const CREATE_APP = "client/CREATE_APP";
 export const CREATE_APP_SUCCESS = "client/CREATE_APP_SUCCESS";
 export const CREATE_APP_FAILURE = "client/CREATE_APP_FAILURE";
+
+export const GET_APP_INFO = "client/GET_APP_INFO";
+export const GET_APP_INFO_SUCCESS = "client/GET_APP_INFO_SUCCESS";
+export const GET_APP_INFO_FAILURE = "client/GET_APP_INFO_FAILURE";
 
 export const SAVE_REQUIREMENT = "client/SAVE_REQUIREMENT";
 export const SAVE_REQUIREMENT_SUCCESS = "client/SAVE_REQUIREMENT_SUCCESS";
@@ -38,14 +45,18 @@ export const LOAD_DRYRUN_RESULT_FAILURE = "client/LOAD_DRYRUN_RESULT_FAILURE";
 export const NOTIFICATION = "client/NOTIFICATION";
 export const CLEAR_NOTIFICATION = "client/CLEAR_NOTIFICATION";
 
+export const GET_RESULT = "client/GET_RESULT";
+export const GET_RESULT_SUCCESS = "client/GET_RESULT_SUCCESS";
+export const GET_RESULT_FAILURE = "client/GET_RESULT_FAILURE";
+
 const events = [
   LIST_APPS,
   CREATE_APP,
+  GET_APP_INFO,
   LOAD_BLUEPRINT,
   SAVE_BLUEPRINT,
   LOAD_BLUEPRINT_JSON,
-  LOAD_DRYRUN_PLAN,
-  LOAD_DRYRUN_RESULT
+  LOAD_DRYRUN_PLAN
 ];
 
 const list_appsState = {
@@ -54,7 +65,8 @@ const list_appsState = {
   yml: "",
   loading: false,
   status: "unknown", // could be either: unknown, success, failure
-  error: ""
+  error: "",
+  app_status: ""
 };
 
 export default (state = list_appsState, action) => {
@@ -66,6 +78,7 @@ export default (state = list_appsState, action) => {
     };
   }
 
+  // success reducers
   if (action.type.includes("_SUCCESS")) {
     let baseState = {
       ...state,
@@ -103,12 +116,18 @@ export default (state = list_appsState, action) => {
           data: action.data
         });
 
+      case GET_APP_INFO_SUCCESS:
+        return Object.assign(baseState, {
+          app_status: action.data.status.status,
+          data: action.data
+        });
+
       default:
         return Object.assign(baseState, { data: action.data });
     }
   }
 
-  // ajax call failure
+  // failure reducers
   if (action.type.includes("_FAILURE")) {
     let baseState = {
       ...state,
@@ -126,8 +145,16 @@ export default (state = list_appsState, action) => {
     }
   }
 
-  // notification
+  // other reducers
   switch (action.type) {
+    // get app info
+    case GET_APP_INFO:
+      return {
+        ...state,
+        app_status: ""
+      };
+
+    // notification
     case NOTIFICATION:
       return {
         ...state,
@@ -157,7 +184,6 @@ const callAPI = (dispatch, base_type, verb, url, payload = {}) => {
   try {
     axios(config)
       .then(response => {
-        let type = base_type + "_SUCCESS";
         console.log(
           verb,
           url,
@@ -167,7 +193,7 @@ const callAPI = (dispatch, base_type, verb, url, payload = {}) => {
           JSON.stringify(response.data)
         );
         dispatch({
-          type: type,
+          type: base_type + "_SUCCESS",
           data: response.data,
           payload: payload
         });
@@ -181,6 +207,61 @@ const callAPI = (dispatch, base_type, verb, url, payload = {}) => {
           "\nerror = ",
           JSON.stringify(error)
         );
+
+        dispatch({ type: base_type + "_FAILURE", error: error.message });
+        dispatch({
+          type: NOTIFICATION,
+          color: "danger",
+          message: error.message
+        });
+      });
+  } catch (error) {
+    let message = "";
+    if (error.response) {
+      // The request was made and the server responded with a status code
+      // that falls out of the range of 2xx
+      message = `${error.response.status} ${error.response.data}`;
+    } else if (error.request) {
+      // The request was made but no response was received
+      // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+      // http.ClientRequest in node.js
+      message = "request sent but got no response";
+    } else {
+      // Something happened in setting up the request that triggered an Error
+      message = error.message;
+    }
+    dispatch({ type: base_type + "_FAILURE", error: message });
+  }
+};
+
+const getResult = (dispatch, base_type, verb, url) => {
+  dispatch({
+    type: base_type
+  });
+
+  let config = {
+    method: verb,
+    url: url
+  };
+
+  try {
+    axios(config)
+      .then(response => {
+        console.log(
+          verb,
+          url,
+          "\nresponse.data = ",
+          JSON.stringify(response.data)
+        );
+
+        dispatch({
+          type: base_type + "_SUCCESS",
+          data: response.data
+        });
+      })
+      .catch(error => {
+        console.log(verb, url, "\nerror = ", JSON.stringify(error));
+
         dispatch({ type: base_type + "_FAILURE", error: error.message });
         dispatch({
           type: NOTIFICATION,
@@ -220,6 +301,12 @@ export const create_app = name => {
   };
 };
 
+export const get_app_info = app_id => {
+  return dispatch => {
+    callAPI(dispatch, GET_APP_INFO, "get", "/apps/" + app_id);
+  };
+};
+
 export const save_requirement = (app_id, payload) => {
   let url = `/apps/${app_id}/sla`;
   return dispatch => {
@@ -251,18 +338,16 @@ export const load_blueprint_json = app_id => {
 };
 
 // dryrun
-
 export const load_dryrun_plan = app_id => {
-  let url = `/apps/${app_id}/dryrun_plan`;
+  let url = `/apps/${app_id}/dryrun_base_plan`;
   return dispatch => {
     callAPI(dispatch, LOAD_DRYRUN_PLAN, "get", url);
   };
 };
 
-export const load_dryrun_result = app_id => {
-  let url = `/apps/${app_id}/dryrun_result`;
+export const get_result = () => {
   return dispatch => {
-    callAPI(dispatch, LOAD_DRYRUN_RESULT, "get", url);
+    getResult(dispatch, GET_RESULT, "get", GET_RESULT_URL);
   };
 };
 

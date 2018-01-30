@@ -383,6 +383,18 @@ $dark: #848484;
     margin: 25px 0 20px 0;
 }
 
+.blue-ribbon {
+    color: $border-blue;
+    background: $box-header;
+    padding: 8px 15px;
+    font-weight: bold;
+}
+
+.white-box {
+    background: white;
+    padding-bottom: 10px;
+}
+
 //dryrun plan
 .plan-form {
     background: white;

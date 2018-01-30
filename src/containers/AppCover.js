@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 
 class AppCover extends Component {
     render() {
-        console.log(this.props);
         let url = `/${this.props.id}/step/1`;
         return (
             <div className="col-md-4">

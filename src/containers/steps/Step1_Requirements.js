@@ -2,7 +2,11 @@ import React, { Component } from "react";
 import { Button } from "reactstrap";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
-import { save_requirement, show_notification } from "../../modules/client";
+import {
+    save_requirement,
+    show_notification,
+    get_app_info
+} from "../../modules/client";
 import { push } from "react-router-redux";
 
 class Step1_Requirements extends Component {
@@ -33,11 +37,21 @@ class Step1_Requirements extends Component {
         }
     }
 
+    componentWillMount() {
+        this.props.get_app_info(this.props.app_id);
+    }
+
     componentWillReceiveProps(nextProps) {
         if (nextProps.status && nextProps.status === "success") {
             this.props.push(
                 `/${this.props.app_id}/step/${this.props.step + 1}`
             );
+        }
+
+        console.log("app status:", nextProps.app_status);
+
+        if (nextProps.app_status && nextProps.app_status === "PLAN_GENERATED") {
+            this.props.push(`/${this.props.app_id}/step/6`);
         }
     }
 
@@ -88,9 +102,13 @@ class Step1_Requirements extends Component {
     }
 }
 const mapStateToProps = state => ({
-    status: state.client.status
+    status: state.client.status,
+    app_status: state.client.app_status
 });
 const mapDispatchToProps = dispatch =>
-    bindActionCreators({ save_requirement, push, show_notification }, dispatch);
+    bindActionCreators(
+        { save_requirement, push, show_notification, get_app_info },
+        dispatch
+    );
 
 export default connect(mapStateToProps, mapDispatchToProps)(Step1_Requirements);
