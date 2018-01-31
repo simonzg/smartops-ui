@@ -56,7 +56,8 @@ const events = [
   LOAD_BLUEPRINT,
   SAVE_BLUEPRINT,
   LOAD_BLUEPRINT_JSON,
-  LOAD_DRYRUN_PLAN
+  LOAD_DRYRUN_PLAN,
+  GET_RESULT
 ];
 
 const list_appsState = {
@@ -233,7 +234,7 @@ const callAPI = (dispatch, base_type, verb, url, payload = {}) => {
     dispatch({ type: base_type + "_FAILURE", error: message });
   }
 };
-
+/*
 const getResult = (dispatch, base_type, verb, url) => {
   dispatch({
     type: base_type
@@ -287,7 +288,7 @@ const getResult = (dispatch, base_type, verb, url) => {
     dispatch({ type: base_type + "_FAILURE", error: message });
   }
 };
-
+*/
 // apps
 export const list_apps = () => {
   return dispatch => {
@@ -345,9 +346,10 @@ export const load_dryrun_plan = app_id => {
   };
 };
 
-export const get_result = () => {
+export const get_result = app_id => {
+  let url = `/apps/${app_id}/dry_run_result`;
   return dispatch => {
-    getResult(dispatch, GET_RESULT, "get", GET_RESULT_URL);
+    callAPI(dispatch, GET_RESULT, "get", url);
   };
 };
 
