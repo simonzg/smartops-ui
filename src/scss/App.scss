@@ -347,7 +347,7 @@ $dark: #848484;
             color: $dark-blue;
 
             .title {
-                font-size: 24px;
+                font-size: 18px;
                 font-weight: bold;
             }
         }
@@ -459,4 +459,10 @@ $dark: #848484;
     90% {
         transform: translateY(-52px);
     }
+}
+
+.progress-bar {
+    height: 1.3rem;
+    line-height: 1.3rem;
+    color: white !important;
 }
