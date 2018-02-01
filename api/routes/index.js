@@ -52,7 +52,9 @@ router.put("/apps/:app_id/sla", (req, res, next) => {
     error_rate: 0.5
   });
 });
-
+router.get("/apps/:app_id", (req, res, next) => {
+  res.json({ status: {} });
+});
 // get blueprint
 router.get("/apps/:app_id/raw_blueprint", (req, res, next) => {
   res.send(
@@ -64,12 +66,12 @@ router.get("/apps/:app_id/raw_blueprint", (req, res, next) => {
 router.put("/apps/:app_id/blueprint", (req, res, next) => {
   // input:
   // {content: ".....yaml"}
-  res.json(util.sample_json);
+  res.json(util.sample_blueprint);
 });
 
 // get blueprint json
 router.get("/apps/:app_id/blueprint", (req, res, next) => {
-  res.json(util.sample_json);
+  res.json(util.sample_blueprint);
 });
 
 // set test plan
@@ -93,40 +95,16 @@ router.put("/apps/:app_id", (req, res, next) => {
 });
 
 // get dry run plan
-router.get("/apps/<int:app_id>/dryrun_base_plan", (req, res, next) => {
-  res.json([
-    {
-      name: "mysql",
-      containers: [
-        {
-          memory: 1024.0,
-          name: "mysql",
-          cpu: 1.0
-        }
-      ],
-      pod_replicas: 1
-    },
-    {
-      name: "web",
-      containers: [
-        {
-          memory: 1024.0,
-          name: "web",
-          cpu: 1.0
-        }
-      ],
-      pod_replicas: 1
-    }
-  ]);
+router.get("/apps/:app_id/dryrun_base_plan", (req, res, next) => {
+  res.json(util.dryrun_base_plan);
+});
+
+router.get("/apps/:app_id/dry_run_result", (req, res, next) => {
+  res.json(util.dryrun_result);
 });
 
 // trigger dry run plan
-router.post("/apps/<int:app_id>/dryrun", (req, res, next) => {
-  //?
-});
-
-// download dry run result
-router.put("/apps/:app_id", (req, res, next) => {
+router.post("/apps/:app_id/dryrun", (req, res, next) => {
   //?
 });
 

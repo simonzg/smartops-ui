@@ -1,7 +1,7 @@
 import axios from "axios";
 
-// const BASE = "http://10.145.88.67:8000";
-const BASE = "http://10.145.88.68:8000";
+// const BASE = "http://10.145.88.68:8000";
+const BASE = "http://localhost:8000";
 
 const GET_RESULT_URL =
   "http://10.145.88.66:30500/api/autoshift/api/v1/apps/6/demand-profiles/11/all-merged";
@@ -67,7 +67,8 @@ const list_appsState = {
   loading: false,
   status: "unknown", // could be either: unknown, success, failure
   error: "",
-  app_status: ""
+  app_status: "",
+  last_updated: new Date()
 };
 
 export default (state = list_appsState, action) => {
@@ -84,7 +85,8 @@ export default (state = list_appsState, action) => {
     let baseState = {
       ...state,
       loading: false,
-      error: ""
+      error: "",
+      last_updated: new Date()
     };
 
     // save or create
@@ -93,7 +95,8 @@ export default (state = list_appsState, action) => {
       baseState = {
         ...state,
         loading: false,
-        status: "success"
+        status: "success",
+        last_updated: new Date()
       };
     }
 
@@ -114,7 +117,8 @@ export default (state = list_appsState, action) => {
       case LOAD_BLUEPRINT_SUCCESS:
         return Object.assign(baseState, {
           yml: action.data,
-          data: action.data
+          data: action.data,
+          last_updated: new Date()
         });
 
       case GET_APP_INFO_SUCCESS:

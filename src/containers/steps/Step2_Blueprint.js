@@ -24,7 +24,7 @@ class Step2_Blueprint extends Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        console.log("recved props: ", nextProps);
+        console.log("next props: ", nextProps);
         if (nextProps.hasOwnProperty("yml")) {
             this.setState({ yml: nextProps.yml });
         }
@@ -52,15 +52,19 @@ class Step2_Blueprint extends Component {
             <div className="container body-container">
                 <div className="page-title"> Application Blue Print </div>
 
-                <AceEditor
-                    mode="yaml"
-                    theme="monokai"
-                    name="editor"
-                    value={this.state.yml}
-                    editorProps={{ $blockScrolling: true }}
-                    style={{ width: "100%", height: "500px" }}
-                    onChange={this.onChange}
-                />
+                {this.state.yml && (
+                    <AceEditor
+                        mode="yaml"
+                        theme="monokai"
+                        name="editor"
+                        value={this.state.yml}
+                        editorProps={{ $blockScrolling: true }}
+                        style={{ width: "100%", height: "500px" }}
+                        onChange={this.onChange}
+                    />
+                )}
+
+                {!this.state.yml && <div>Loading...</div>}
                 <div className="action-footer">
                     <Button
                         className="btn btn-main"
@@ -78,7 +82,8 @@ const mapStateToProps = state => {
     console.log("new state: ", state);
     return {
         yml: state.client.yml,
-        status: state.client.status
+        status: state.client.status,
+        last_updated: state.client.last_updated
     };
 };
 
