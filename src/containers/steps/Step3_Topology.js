@@ -1,11 +1,10 @@
 import React, { Component } from "react";
-import { FormGroup, Input, Label } from "reactstrap";
+import { FormGroup, Input, Label, Button } from "reactstrap";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
-import { load_blueprint_json } from "../../modules/client";
+import { load_blueprint_json, update_app } from "../../modules/client";
 import TopologyGroup from "./TopologyGroup";
-
-import { Link } from "react-router-dom";
+import { push } from "react-router-redux";
 
 class Step3_Topology extends Component {
     constructor(props) {
@@ -15,10 +14,17 @@ class Step3_Topology extends Component {
         this.state = {
             entrypoint: ""
         };
+        this.handleSubmit = this.handleSubmit.bind(this);
     }
 
     handleChange(event) {
         this.setState({ [event.target.name]: event.target.value });
+    }
+
+    handleSubmit() {
+        this.props.update_app(this.props.app_id, {
+            entrypoint: this.state.entrypoint
+        });
     }
 
     componentWillMount() {
@@ -26,6 +32,7 @@ class Step3_Topology extends Component {
     }
 
     componentWillReceiveProps(nextProps) {
+        console.log("next props = ", nextProps);
         if (nextProps.status && nextProps.status === "success") {
             this.props.push(
                 `/${this.props.app_id}/step/${this.props.step + 1}`
@@ -81,9 +88,12 @@ class Step3_Topology extends Component {
                 </div>
                 <div className="topology">{topologies}</div>
                 <div className="action-footer">
-                    <Link className="btn btn-main" to={next_url}>
-                        Next
-                    </Link>
+                    <Button
+                        className="btn btn-main"
+                        onClick={this.handleSubmit}
+                    >
+                        Save
+                    </Button>
                 </div>
             </div>
         );
@@ -93,10 +103,11 @@ class Step3_Topology extends Component {
 const mapStateToProps = state => ({
     topology: state.client.data.topology,
     data: state.client.data,
+    status: state.client.status,
     entrypoints: state.client.data.entrypoints
 });
 
 const mapDispatchToProps = dispatch =>
-    bindActionCreators({ load_blueprint_json }, dispatch);
+    bindActionCreators({ load_blueprint_json, update_app, push }, dispatch);
 
 export default connect(mapStateToProps, mapDispatchToProps)(Step3_Topology);

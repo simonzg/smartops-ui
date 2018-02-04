@@ -34,6 +34,10 @@ export const LOAD_BLUEPRINT_JSON = "client/LOAD_BLUEPRINT_JSON";
 export const LOAD_BLUEPRINT_JSON_SUCCESS = "client/LOAD_BLUEPRINT_JSON_SUCCESS";
 export const LOAD_BLUEPRINT_JSON_FAILURE = "client/LOAD_BLUEPRINT_JSON_FAILURE";
 
+export const UPDATE_APP = "client/UPDATE_APP";
+export const UPDATE_APP_SUCCESS = "client/UPDATE_APP_SUCCESS";
+export const UPDATE_APP_FAILURE = "client/UPDATE_APP_FAILURE";
+
 export const LOAD_DRYRUN_PLAN = "client/LOAD_DRYRUN_PLAN";
 export const LOAD_DRYRUN_PLAN_SUCCESS = "client/LOAD_DRYRUN_PLAN_SUCCESS";
 export const LOAD_DRYRUN_PLAN_FAILURE = "client/LOAD_DRYRUN_PLAN_FAILURE";
@@ -49,7 +53,7 @@ export const GET_RESULT = "client/GET_RESULT";
 export const GET_RESULT_SUCCESS = "client/GET_RESULT_SUCCESS";
 export const GET_RESULT_FAILURE = "client/GET_RESULT_FAILURE";
 
-const events = [
+const ajax_events = [
   LIST_APPS,
   CREATE_APP,
   GET_APP_INFO,
@@ -57,7 +61,16 @@ const events = [
   SAVE_BLUEPRINT,
   LOAD_BLUEPRINT_JSON,
   LOAD_DRYRUN_PLAN,
-  GET_RESULT
+  GET_RESULT,
+  SAVE_REQUIREMENT,
+  UPDATE_APP
+];
+
+const next_page_events = [
+  CREATE_APP_SUCCESS,
+  SAVE_BLUEPRINT_SUCCESS,
+  SAVE_REQUIREMENT_SUCCESS,
+  UPDATE_APP_SUCCESS
 ];
 
 const list_appsState = {
@@ -72,7 +85,7 @@ const list_appsState = {
 };
 
 export default (state = list_appsState, action) => {
-  if (events.includes(action.type)) {
+  if (ajax_events.includes(action.type)) {
     return {
       ...state,
       loading: true,
@@ -86,17 +99,15 @@ export default (state = list_appsState, action) => {
       ...state,
       loading: false,
       error: "",
+      data: action.data,
       last_updated: new Date()
     };
 
-    // save or create
-    if (action.type.includes("CREATE_") || action.type.includes("SAVE_")) {
-      console.log("SAVE_OR_CREATE");
+    // next page
+    if (next_page_events.includes(action.type)) {
       baseState = {
-        ...state,
-        loading: false,
-        status: "success",
-        last_updated: new Date()
+        ...baseState,
+        status: "success"
       };
     }
 
@@ -104,31 +115,27 @@ export default (state = list_appsState, action) => {
     switch (action.type) {
       case LIST_APPS_SUCCESS:
         return Object.assign(baseState, {
-          apps: action.data,
-          data: action.data
+          apps: action.data
         });
 
       case CREATE_APP_SUCCESS:
         return Object.assign(baseState, {
-          apps: [...state.apps, action.data],
-          data: action.data
+          apps: [...state.apps, action.data]
         });
 
       case LOAD_BLUEPRINT_SUCCESS:
         return Object.assign(baseState, {
           yml: action.data,
-          data: action.data,
           last_updated: new Date()
         });
 
       case GET_APP_INFO_SUCCESS:
         return Object.assign(baseState, {
-          app_status: action.data.status.status,
-          data: action.data
+          app_status: action.data.status.status
         });
 
       default:
-        return Object.assign(baseState, { data: action.data });
+        return baseState;
     }
   }
 
@@ -303,6 +310,13 @@ export const list_apps = () => {
 export const create_app = name => {
   return dispatch => {
     callAPI(dispatch, CREATE_APP, "post", "/apps", { name: name });
+  };
+};
+
+export const update_app = (app_id, data) => {
+  let url = `/apps/${app_id}`;
+  return dispatch => {
+    callAPI(dispatch, UPDATE_APP, "put", url, data);
   };
 };
 

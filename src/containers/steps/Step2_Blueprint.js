@@ -67,7 +67,7 @@ class Step2_Blueprint extends Component {
                         className="btn btn-main"
                         onClick={this.handleSubmit}
                     >
-                        Next
+                        Save
                     </Button>
                 </div>
             </div>

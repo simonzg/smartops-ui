@@ -3,6 +3,7 @@ import { Button } from "reactstrap";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 import { load_dryrun_plan } from "../../modules/client";
+import { push } from "react-router-redux";
 
 class Step5_DryRunPlan extends Component {
   constructor(props) {
@@ -19,13 +20,20 @@ class Step5_DryRunPlan extends Component {
     this.setState({ enable_run: false });
   }
 
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.status && nextProps.status === "success") {
+      this.props.push(`/${this.props.app_id}/step/${this.props.step + 1}`);
+    }
+  }
+
   render() {
     let content = <div />;
     let runBtnClass = "btn btn-main ";
-    let runBtnText = "Run";
+    let runBtnText = "Start Dryrun";
     if (!this.state.enable_run) {
       runBtnClass += "disabled";
       runBtnText = "Running ...";
+      this.props.push(`/${this.props.app_id}/step/${this.props.step + 1}`);
     }
     if (this.props.plan && this.props.plan.length > 0) {
       content = this.props.plan.map((el, idx) => {
@@ -110,6 +118,6 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch =>
-  bindActionCreators({ load_dryrun_plan }, dispatch);
+  bindActionCreators({ load_dryrun_plan, push }, dispatch);
 
 export default connect(mapStateToProps, mapDispatchToProps)(Step5_DryRunPlan);
