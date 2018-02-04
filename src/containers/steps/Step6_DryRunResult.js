@@ -74,9 +74,16 @@ class Step6_DryRunResult extends Component {
         <ul className="result-table-head">
           <div
             className="title text-center"
-            style={{ marginBottom: 15, fontWeight: "bold", fontSize: 16 }}
+            style={{
+              background: "#cfe8fc",
+              marginBottom: 15,
+              fontWeight: "bold",
+              fontSize: 16,
+              paddingTop: 8,
+              paddingBottom: 5
+            }}
           >
-            {plan.is_auto ? "Auto Plan" : "Manual Plan"}
+            {plan.is_auto ? "Auto Plan " + (1 + idx) : "Manual Plan"}
           </div>
 
           <li>
@@ -99,13 +106,17 @@ class Step6_DryRunResult extends Component {
             <div className="row">
               <div className="col-12" style={{ marginTop: 15 }}>
                 <div className="title"> Latency </div>
-                <Progress color="success" value={plan.latency * 100 / 5000}>
+                <Progress
+                  striped
+                  color="success"
+                  value={plan.latency * 100 / 5000}
+                >
                   {plan.latency} ms
                 </Progress>
               </div>
               <div className="col-12" style={{ marginTop: 15 }}>
                 <div className="title">Error Rate</div>
-                <Progress color="warning" value={plan.error_rate}>
+                <Progress striped color="warning" value={plan.error_rate}>
                   {plan.error_rate.toFixed(1)} %
                 </Progress>
               </div>
@@ -139,13 +150,21 @@ class Step6_DryRunResult extends Component {
       manualPlanTable = this.renderTable(plan, -1);
     }
     console.log(autoPlansTable);
+
+    let result_status = this.props.result.auto_plan_status;
+
     return (
       <div className="container body-container">
         <h1 className="page-title">Dry Run Result</h1>
         <div className="col-10 " style={{ paddingLeft: 0 }}>
           <div className="row">
-            {manualPlanTable}
-            {autoPlansTable}
+            {result_status == "COMPLETED" && manualPlanTable}
+            {result_status == "COMPLETED" && autoPlansTable}
+            {result_status == "CREATED" && (
+              <div className="col-12">
+                Dry run has been created, please wait for it to complete
+              </div>
+            )}
           </div>
         </div>
       </div>

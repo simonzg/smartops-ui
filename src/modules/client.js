@@ -1,7 +1,7 @@
 import axios from "axios";
 
 // const BASE = "http://10.145.88.68:8000";
-const BASE = "http://localhost:8000";
+const BASE = "http://12.234.32.103:8000";
 
 const GET_RESULT_URL =
   "http://10.145.88.66:30500/api/autoshift/api/v1/apps/6/demand-profiles/11/all-merged";

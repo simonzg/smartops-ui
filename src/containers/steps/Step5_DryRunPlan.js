@@ -34,7 +34,7 @@ class Step5_DryRunPlan extends Component {
             <div className="blue-ribbon row">
               <div className="col-12">Pod:{el.name}</div>
             </div>
-            <div className="row">
+            <div className="row hover-bg">
               <div className="col">
                 <div className="title">Containers</div>
               </div>
@@ -47,7 +47,7 @@ class Step5_DryRunPlan extends Component {
         let details = el.containers.map((c, i) => {
           return (
             <div key={i} className="white-box">
-              <div className="row">
+              <div className="row hover-bg">
                 <div className="col">
                   <div className="title">
                     <b>{c.name}</b>
@@ -58,7 +58,7 @@ class Step5_DryRunPlan extends Component {
                 </div>
               </div>
 
-              <div className="row">
+              <div className="row hover-bg">
                 <div className="col">
                   <div className="title">CPU</div>
                 </div>
@@ -66,7 +66,7 @@ class Step5_DryRunPlan extends Component {
                   <div className="stats">{c.cpu}</div>
                 </div>
               </div>
-              <div className="row">
+              <div className="row hover-bg">
                 <div className="col">
                   <div className="title">Memory</div>
                 </div>
@@ -86,7 +86,7 @@ class Step5_DryRunPlan extends Component {
         );
       });
     } else {
-      content = <div />;
+      content = <div style={{ background: "#f5f5f5" }}>Loading...</div>;
     }
 
     return (

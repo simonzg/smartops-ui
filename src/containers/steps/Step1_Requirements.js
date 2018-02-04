@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Button } from "reactstrap";
+import { Button, InputGroupAddon, InputGroup, Input } from "reactstrap";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 import {
@@ -19,7 +19,19 @@ class Step1_Requirements extends Component {
     }
 
     handleChange(event) {
-        this.setState({ [event.target.name]: event.target.value });
+        let key = event.target.name;
+        let val = event.target.value;
+
+        if (key == "error_rate") {
+            val = val > 100 ? 100 : val;
+            val = val < 0 ? 0 : val;
+        }
+
+        if (key == "latency") {
+            val = val > 7000 ? 7000 : val;
+            val = val < 0 ? 0 : val;
+        }
+        this.setState({ [key]: val });
     }
 
     validateForm() {
@@ -64,14 +76,17 @@ class Step1_Requirements extends Component {
                         Maximum Tail Latency
                     </label>
                     <div className="col-5">
-                        <input
-                            className="form-control"
-                            name="latency"
-                            placeholder=" "
-                            onChange={this.handleChange}
-                            type="number"
-                            value={this.state.latency}
-                        />
+                        <InputGroup>
+                            <Input
+                                className="form-control"
+                                name="latency"
+                                placeholder=" "
+                                onChange={this.handleChange}
+                                type="number"
+                                value={this.state.latency}
+                            />
+                            <InputGroupAddon>ms</InputGroupAddon>
+                        </InputGroup>
                     </div>
                 </div>
                 <div className="form-group row">
@@ -79,14 +94,19 @@ class Step1_Requirements extends Component {
                         Maximum Error Rate
                     </label>
                     <div className="col-5">
-                        <input
-                            className="form-control"
-                            name="error_rate"
-                            placeholder=" "
-                            onChange={this.handleChange}
-                            type="number"
-                            value={this.state.error_rate}
-                        />
+                        <InputGroup>
+                            <Input
+                                className="form-control"
+                                name="error_rate"
+                                placeholder=" "
+                                onChange={this.handleChange}
+                                min={1}
+                                max={100}
+                                type="number"
+                                value={this.state.error_rate}
+                            />
+                            <InputGroupAddon>%&nbsp;</InputGroupAddon>
+                        </InputGroup>
                     </div>
                 </div>
                 <div className="action-footer">

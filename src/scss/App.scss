@@ -97,6 +97,21 @@ $box-header: #bce0fd;
     }
 }
 
+.form-control {
+    &::-webkit-input-placeholder {
+        color: #a8a8a8;
+    }
+    &::-moz-placeholder {
+        color: #a8a8a8;
+    }
+    &:-ms-input-placeholder {
+        color: #a8a8a8;
+    }
+    &:-moz-placeholder {
+        color: #a8a8a8;
+    }
+}
+
 //content title(jessy)
 .body-container {
     //margin-left: 300px;
@@ -117,10 +132,10 @@ $box-header: #bce0fd;
 
     .form-group {
         input {
-            border: 0.5px solid #2699fb;
+            // border: 0.5px solid #2699fb;
             border-radius: 3px;
             padding: 10px;
-            margin-bottom: 15px;
+            // margin-bottom: 15px;
         }
 
         .btn-primary {
@@ -272,8 +287,9 @@ body {
 
 //app topology
 .topology-group {
-    margin-top: 50px;
+    margin-top: 22px;
     padding-left: 0;
+    margin-bottom: 25px;
 
     li {
         list-style: none;
@@ -334,10 +350,13 @@ $dark: #848484;
 //dryrun result
 .result-table {
     ul.result-table-head {
-        background: $light-blue;
-        padding: 20px;
+        background: #f5f9ff;
+        padding: 0;
+        padding-bottom: 20px;
         margin: 0;
         margin-top: 20px;
+        border: 1px solid $light-blue;
+        border-bottom: none;
 
         li {
             list-style: none;
@@ -393,6 +412,10 @@ $dark: #848484;
 .white-box {
     background: white;
     padding-bottom: 10px;
+}
+
+.hover-bg:hover {
+    background: lighten($box-header, 10%);
 }
 
 //dryrun plan

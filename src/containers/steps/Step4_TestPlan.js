@@ -51,7 +51,7 @@ class Step4_TestPlan extends Component {
             <div className="container body-container">
                 <h1 className="page-title">Test Plan</h1>
                 <div className="row">
-                    <div className="col-3">
+                    <div className="col-2">
                         <FormGroup>
                             <Label>HTTP Verb</Label>
                             <Input
@@ -64,38 +64,45 @@ class Step4_TestPlan extends Component {
                                 <option>POST</option>
                             </Input>
                         </FormGroup>
-
-                        <FormGroup>
-                            <Label>Content Type</Label>
-                            <Input
-                                type="select"
-                                name="content_type"
-                                onChange={this.handleChange}
-                            >
-                                <option>application/json</option>
-                                <option>application/xml</option>
-                            </Input>
-                        </FormGroup>
                     </div>
 
-                    <div className="col-7">
+                    <div className="col-6">
                         <FormGroup>
                             <Label>Url</Label>
                             <Input
                                 type="text"
                                 name="url"
                                 onChange={this.handleChange}
+                                placeholder="http://...."
                             />
                         </FormGroup>
-
+                    </div>
+                    <div className="col-2">
                         <FormGroup>
-                            <Label>Request load per second</Label>
+                            <Label>Load (req/s)</Label>
                             <Input
                                 type="number"
                                 name="request_per_second"
                                 onChange={this.handleChange}
+                                placeholder={5}
                             />
                         </FormGroup>
+                    </div>
+                    <div className="col-2" />
+                    <div className="col-2">
+                        {this.state.method !== "GET" && (
+                            <FormGroup>
+                                <Label>Content Type</Label>
+                                <Input
+                                    type="select"
+                                    name="content_type"
+                                    onChange={this.handleChange}
+                                >
+                                    <option>application/json</option>
+                                    <option>application/xml</option>
+                                </Input>
+                            </FormGroup>
+                        )}
                     </div>
                 </div>
 

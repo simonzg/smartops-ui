@@ -37,8 +37,12 @@ class Step3_Topology extends Component {
         let topologies = <div />;
         if (this.props.topology && Object.keys(this.props.topology)) {
             let pod_names = Object.keys(this.props.topology);
-            topologies = pod_names.map(pn => (
-                <TopologyGroup {...this.props.topology[pn]} pod_name={pn} />
+            topologies = pod_names.map((pn, idx) => (
+                <TopologyGroup
+                    {...this.props.topology[pn]}
+                    pod_name={pn}
+                    key={idx}
+                />
             ));
         }
 
@@ -47,8 +51,10 @@ class Step3_Topology extends Component {
             if (this.state.entrypoint !== this.props.entrypoints[0]) {
                 this.setState({ entrypoint: this.props.entrypoints[0] });
             }
-            entrypoints = this.props.entrypoints.map(ep => (
-                <option value={ep}>{ep}</option>
+            entrypoints = this.props.entrypoints.map((ep, idx) => (
+                <option value={ep} key={idx}>
+                    {ep}
+                </option>
             ));
         }
 
@@ -59,8 +65,10 @@ class Step3_Topology extends Component {
                 <div className="page-title"> Application Topology</div>
                 <div className="row">
                     <div className="col-3">
-                        <FormGroup>
-                            <Label>Entrypoints</Label>
+                        <Label>Entrypoint</Label>
+                        <FormGroup
+                            style={{ display: "inline-block", marginLeft: 20 }}
+                        >
                             <Input
                                 type="select"
                                 name="method"
